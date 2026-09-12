@@ -13,12 +13,12 @@ Un sistema agéntico local que se conecta a la API de HubSpot CRM para extraer l
 4. "Construí una interfaz web en un dashboard interactivo que permita seleccionar la fecha, visualizar el estado del día (Saludable/Alerta/Crítico), renderizar las recomendaciones operativas y exportar las corridas oficiales directamente a la carpeta `corridas/`."
 
 ## Qué funciona
-* **Conector real de HubSpot:** Consulta tickets mediante la API v3 (`/crm/v3/objects/tickets/search`) filtrando por fecha (`createdate`) y extrayendo campos de asunto, descripción, prioridad y estado.
-* **Contrato agéntico estructurado:** Gemini procesa el lote devolviendo siempre un objeto JSON válido con diagnóstico, distribución por categoría, Top 3 de fricciones y alertas inmediatas.
+* **Conector real de HubSpot CRM:** Consulta tickets mediante la API v3 (`POST /crm/v3/objects/tickets/search`) filtrando por fecha (`createdate`) y extrayendo campos de asunto, descripción, prioridad y estado, con fallback automático a datasets verificados ante problemas de red.
+* **Contrato agéntico oficial RCTA (5 dimensiones):** Gemini procesa el lote devolviendo siempre un objeto JSON válido con Métricas de Gestión Operativa (split René Bot vs Humanos), Leaderboard de Agentes, Diagnóstico de Producto por Semáforo (🔴/🟡/🟢), Escalaciones del Bot y Workarounds documentados.
 * **Control de re-ejecuciones y cache:** Si una fecha ya fue procesada, la interfaz muestra un modal de advertencia para evitar costos de inferencia innecesarios, permitiendo recargar el reporte almacenado o forzar una re-ejecución.
-* **Medición de tokens y costos:** Cada ejecución registra tokens de entrada y salida reales y calcula el costo monetario en USD.
-* **Tres corridas reales registradas:** Guardadas en `corridas/corrida_1.md`, `corridas/corrida_2.md` y `corridas/corrida_3.md` con entradas completas de tickets, salidas y niveles de supervisión definidos.
-* **Documentación completa de gobierno y economía:** En `DECISIONES.md` se detallan las iteraciones de prompt, el análisis económico proyectado a escala y el marco de gobierno L0–L4 con firma responsable.
+* **Medición de tokens y costos:** Cada ejecución registra tokens de entrada y salida reales y calcula el costo monetario en USD con el criterio de modelo más chico (`gemini-2.5-flash`).
+* **Tres corridas reales registradas:** Guardadas en `corridas/corrida_1.md`, `corridas/corrida_2.md` y `corridas/corrida_3.md` con entradas completas de tickets de producción, salidas estructuradas y niveles de supervisión definidos.
+* **Documentación completa de gobierno y economía:** En `DECISIONES.md` se detallan las 3 iteraciones de prompt/diseño, el análisis económico proyectado a escala y el marco de gobierno L0–L4 con firma profesional de Walter Peron.
 
 ## Qué falta o qué falló
 * **Falla de formato inicial:** En la primera versión del System Prompt, el modelo incluía introducciones conversacionales ("A continuación presento el reporte...") que rompían el parseo automático de JSON en Python con un error `JSONDecodeError`. Se solucionó forzando `responseMimeType: application/json` y agregando una prohibición estricta de saludos en el prompt.

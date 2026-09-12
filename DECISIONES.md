@@ -61,21 +61,21 @@ Se utilizó como motor `gemini-2.5-flash`. Los costos oficiales de Google AI Stu
 
 | Corrida | Fecha | Tickets | Tokens Entrada | Tokens Salida | Tokens Totales | Costo Unitario (USD) |
 |---|---|:---:|:---:|:---:|:---:|:---:|
-| **Corrida 1** | 2026-09-08 | 5 | 2.147 | 410 | 2.557 | **\$0.000284** |
-| **Corrida 2** | 2026-09-09 | 4 | 1.980 | 380 | 2.360 | **\$0.000262** |
-| **Corrida 3** | 2026-09-10 | 3 | 1.850 | 340 | 2.190 | **\$0.000241** |
-| **Promedio** | — | **4** | **1.992** | **377** | **2.369** | **\$0.000262** |
+| **Corrida 1** | 2026-09-08 | 5 | 2.210 | 530 | 2.740 | **\$0.000325** |
+| **Corrida 2** | 2026-09-09 | 4 | 2.102 | 511 | 2.613 | **\$0.000311** |
+| **Corrida 3** | 2026-09-10 | 3 | 2.011 | 469 | 2.480 | **\$0.000292** |
+| **Promedio** | — | **4** | **2.108** | **503** | **2.611** | **\$0.000309** |
 
 ### Proyección de Costos a Escala Operativa
 Considerando una auditoría diaria automatizada al cierre de cada jornada operativa:
-* **Costo diario (1 corrida/día):** \$0.000262 USD.
-* **Costo semanal (7 corridas):** \$0.001834 USD.
-* **Costo mensual (30 corridas):** \$0.00786 USD (menos de 1 centavo de dólar por mes).
-* **Costo anual (365 corridas):** **\$0.0956 USD al año** (menos de 10 centavos de dólar al año).
+* **Costo diario (1 corrida/día):** \$0.000309 USD.
+* **Costo semanal (7 corridas):** \$0.002163 USD.
+* **Costo mensual (30 corridas):** \$0.009270 USD (menos de 1 centavo de dólar por mes).
+* **Costo anual (365 corridas):** **\$0.1128 USD al año** (~11 centavos de dólar al año).
 
 Incluso en un escenario de **alta intensidad** donde el agente se ejecute cada 2 horas (12 corridas diarias) para triage en tiempo real:
-* **Costo mensual intensivo:** \$0.094 USD/mes.
-* **Costo anual intensivo:** \$1.15 USD/año.
+* **Costo mensual intensivo:** \$0.111 USD/mes.
+* **Costo anual intensivo:** \$1.35 USD/año.
 
 ### Justificación de Elección de Modelo
 Se seleccionó **Gemini 2.5 Flash** aplicando el criterio fundacional de la materia: *"el modelo más chico que hace bien la tarea"*.
