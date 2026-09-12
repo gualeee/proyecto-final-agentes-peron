@@ -36,11 +36,6 @@ async function loadConfigStatus() {
       hStatus.innerHTML = "<span style='color: var(--text-muted);'>○ Sin token (se usa dataset oficial de prueba RCTA)</span>";
     }
 
-    if (cfg.n8n_webhook_url) {
-      document.getElementById("cfg-n8n-url").value = cfg.n8n_webhook_url;
-      document.getElementById("cfg-n8n-status").innerHTML = "<span style='color: var(--success);'>● Webhook n8n registrado</span>";
-    }
-
     if (cfg.gemini_model) {
       document.getElementById("cfg-gemini-model").value = cfg.gemini_model;
     }
@@ -52,7 +47,6 @@ async function loadConfigStatus() {
 async function saveConfiguration() {
   const gKey = document.getElementById("cfg-gemini-key").value.trim();
   const hToken = document.getElementById("cfg-hubspot-token").value.trim();
-  const n8nUrl = document.getElementById("cfg-n8n-url").value.trim();
   const model = document.getElementById("cfg-gemini-model").value;
 
   try {
@@ -62,7 +56,6 @@ async function saveConfiguration() {
       body: JSON.stringify({
         gemini_api_key: gKey,
         hubspot_token: hToken,
-        n8n_url: n8nUrl,
         gemini_model: model
       })
     });
