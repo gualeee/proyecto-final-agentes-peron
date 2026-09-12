@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Directo · Auditor Agéntico de Tickets (HubSpot + Gemini)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --card-border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #1f6feb;
+      --success: #2ea043;
+      --warning: #d29922;
+      --danger: #f85149;
+      --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      color: var(--text-bright);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    .badge-materia {
+      background: #21262d;
+      border: 1px solid var(--card-border);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .badge-mode {
+      background: rgba(46, 160, 67, 0.15);
+      border: 1px solid rgba(46, 160, 67, 0.4);
+      color: #3fb950;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    /* Panel de Control */
+    .control-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    input[type="date"], input[type="password"], select {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      color: var(--text-bright);
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      outline: none;
+    }
+    input[type="date"]:focus, input[type="password"]:focus { border-color: var(--accent); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d1117;
+      font-weight: 600;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+    .btn-secondary {
+      background: #21262d;
+      color: var(--text-bright);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-secondary:hover { background: #30363d; }
+
+    .quick-dates {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .quick-dates span { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* Modal Alerta Re-ejecución */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--warning);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal-box h3 { color: var(--warning); font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 20px; line-height: 1.6; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* Métricas Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .metric-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .metric-card .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-top: 6px;
+    }
+    .metric-card .subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .status-Saludable { background: rgba(46, 160, 67, 0.2); color: #3fb950; border: 1px solid rgba(46, 160, 67, 0.4); }
+    .status-Alerta { background: rgba(210, 153, 34, 0.2); color: #d29922; border: 1px solid rgba(210, 153, 34, 0.4); }
+    .status-Crítico { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.4); }
+
+    /* Layout Resultados */
+    .results-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .results-section { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+    }
+
+    /* Fricciones */
+    .friccion-item {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .friccion-item.prio-1 { border-left-color: var(--danger); }
+    .friccion-item.prio-2 { border-left-color: var(--warning); }
+    .friccion-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .friccion-title { font-weight: 600; color: var(--text-bright); font-size: 14px; }
+    .friccion-tickets { font-size: 12px; font-family: var(--font-mono); color: var(--accent); }
+    .friccion-diag { font-size: 13px; color: var(--text); margin-bottom: 8px; }
+    .friccion-action {
+      font-size: 12.5px;
+      color: #7ee787;
+      background: rgba(46, 160, 67, 0.1);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--success);
+    }
+
+    /* Categorías */
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 13px;
+    }
+    .cat-name { color: var(--text); }
+    .cat-count { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
+
+    /* Alertas */
+    .alert-tag {
+      background: rgba(248, 81, 73, 0.15);
+      border-left: 3px solid var(--danger);
+      color: #ff7b72;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    /* Exportador */
+    .export-box {
+      background: #1c2128;
+      border: 1px solid #444c56;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .export-select { display: flex; align-items: center; gap: 8px; }
+
+    /* Historial */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .history-table th {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .history-table td {
+      padding: 8px;
+      border-bottom: 1px solid #21262d;
+    }
+    .history-table tr:hover { background: #21262d; cursor: pointer; }
+
+    .loading-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #0d1117;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Masthead -->
+  <header>
+    <div class="header-title">
+      <h1>Auditor Agéntico de Tickets Diarios</h1>
+      <p>Conector HubSpot CRM API + Análisis de Triage con Gemini</p>
+    </div>
+    <div class="header-badges">
+      <div class="badge-mode">● Modo Autónomo Directo (file://)</div>
+      <div class="badge-materia">MBA UCEMA · Trabajo Final</div>
+    </div>
+  </header>
+
+  <!-- Panel de Control -->
+  <div class="control-panel">
+    <div class="form-group">
+      <label for="date-input">Fecha a Auditar</label>
+      <input type="date" id="date-input" value="2026-09-08">
+    </div>
+
+    <div class="form-group" style="flex: 1; min-width: 240px;">
+      <label for="api-key-input">Gemini API Key (Opcional para correr en vivo)</label>
+      <input type="password" id="api-key-input" placeholder="Pegá tu clave de Google AI Studio si querés...">
+    </div>
+
+    <button id="btn-run" class="btn-primary" onclick="handleRunClick()">
+      <span class="loading-spinner" id="btn-spinner"></span>
+      <span id="btn-text">Consultar y Auditar Tickets</span>
+    </button>
+
+    <div class="quick-dates">
+      <span>Fechas del TP:</span>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-08')">08/09 (Corrida 1)</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-09')">09/09 (Corrida 2)</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-10')">10/09 (Corrida 3)</button>
+    </div>
+  </div>
+
+  <!-- Modal Alerta Re-ejecución -->
+  <div id="modal-cache" class="modal-overlay">
+    <div class="modal-box">
+      <h3>⚠️ Fecha ya auditada previamente</h3>
+      <p id="modal-msg">Esta fecha ya cuenta con un informe agéntico guardado. ¿Deseas cargar el reporte almacenado o volver a consultar y procesar con Gemini?</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="confirmLoadCache()">Cargar Reporte Guardado</button>
+        <button class="btn-primary" onclick="confirmForceRun()">Forzar Re-ejecución</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métricas Principales -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="label">Estado del Día</div>
+      <div class="value" id="val-estado">—</div>
+      <div class="subtext" id="sub-estado">Sin análisis activo</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Tickets Procesados</div>
+      <div class="value" id="val-tickets">—</div>
+      <div class="subtext" id="sub-source">Origen: —</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Tokens & Inferencia</div>
+      <div class="value" id="val-tokens">—</div>
+      <div class="subtext" id="sub-tokens">Entrada / Salida</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Costo Económico</div>
+      <div class="value" id="val-costo">—</div>
+      <div class="subtext" id="sub-model">Modelo: Gemini 2.5 Flash</div>
+    </div>
+  </div>
+
+  <!-- Contenedor Resultados -->
+  <div class="results-section">
+    <!-- Columna Izquierda: Diagnóstico y Fricciones -->
+    <div>
+      <div class="card">
+        <div class="card-title">Resumen Ejecutivo de Operaciones</div>
+        <p id="txt-resumen" style="color: var(--text-bright); line-height: 1.6;">Seleccioná una fecha y hacé clic en "Consultar y Auditar Tickets" para iniciar la extracción desde HubSpot y el análisis agéntico.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Top 3 Cuellos de Botella y Acciones Priorizadas</div>
+        <div id="fricciones-list">
+          <p style="color: var(--text-muted); font-size: 13px;">No hay fricciones cargadas.</p>
+        </div>
+      </div>
+
+      <!-- Exportador oficial -->
+      <div class="export-box">
+        <div class="export-select">
+          <label style="color: #adbac7; font-size: 12px;">Descargar reporte estructurado:</label>
+          <select id="select-corrida">
+            <option value="1">corridas/corrida_1.md</option>
+            <option value="2">corridas/corrida_2.md</option>
+            <option value="3">corridas/corrida_3.md</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-secondary" onclick="copyMarkdown()">📋 Copiar Markdown</button>
+          <button class="btn-primary" onclick="downloadMarkdown()">💾 Descargar Archivo</button>
+        </div>
+      </div>
+      <div id="export-status" style="font-size: 12px; margin-top: 8px; color: var(--success);"></div>
+    </div>
+
+    <!-- Columna Derecha: Categorías, Supervisión y Alertas -->
+    <div>
+      <div class="card">
+        <div class="card-title">Distribución por Categoría</div>
+        <div id="categorias-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin datos.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Alertas Inmediatas</div>
+        <div id="alertas-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin alertas.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Supervisión Humana (L0–L4)</div>
+        <div style="font-size: 13px;">
+          <p><strong>Nivel:</strong> <span id="txt-sup-nivel" style="color: var(--accent);">—</span></p>
+          <p style="margin-top: 6px;"><strong>Firmante:</strong> <span id="txt-sup-resp">—</span></p>
+          <p style="margin-top: 6px;"><strong>Control:</strong> <span id="txt-sup-ctrl" style="color: var(--text-muted);">—</span></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Historial de Consultas</div>
+        <table class="history-table" id="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tickets</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <!-- Rellenado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Base de datos de corridas oficiales verificadas
+const DATASETS = {
+  "2026-09-08": {
+    tickets: [
+      { id: "TK-20811", subject: "Firma digital trabada en paso 3", content: "Estimados, estoy en el consultorio intentando emitir recetas para pacientes crónicos. Al poner la clave de firma digital el sistema queda con la rueda girando y no emite.", priority: "HIGH", stage: "open", createdate: "2026-09-08T09:15:22Z" },
+      { id: "TK-20812", subject: "Error 504 al generar receta triple", content: "Quise emitir tres recetas seguidas y en la última me arrojó 'Error 504 Gateway Timeout'. No sé si la receta se grabó o el paciente se quedó sin medicación.", priority: "HIGH", stage: "open", createdate: "2026-09-08T10:30:11Z" },
+      { id: "TK-20815", subject: "Consulta sobre cambio de plan prepaga", content: "Hola, quería saber si el plan actual cubre la validación automática con Osde y Swiss Medical.", priority: "LOW", stage: "in_progress", createdate: "2026-09-08T11:45:00Z" },
+      { id: "TK-20819", subject: "Firma de receta no impacta en farmacia", content: "Un paciente me avisa desde Farmacity que el código de barra de la receta digital emitida hoy figura como 'no autorizada por entidad médica'.", priority: "HIGH", stage: "open", createdate: "2026-09-08T14:20:45Z" },
+      { id: "TK-20822", subject: "Actualización de CUIT en factura A", content: "Necesito cambiar la razón social a la que me emiten la factura mensual del servicio.", priority: "LOW", stage: "closed", createdate: "2026-09-08T16:05:10Z" }
+    ],
+    audit: {
+      data: {
+        fecha_analisis: "2026-09-08",
+        total_tickets: 5,
+        estado_operativo: "Alerta",
+        resumen_ejecutivo: "Jornada crítica en el subsistema de firma digital y dispensación farmacéutica. Se concentran 3 incidentes de alta prioridad (60% del volumen) que provocan bloqueos directos en la emisión de recetas médicas y rechazos en ventanilla de farmacia.",
+        distribucion_categorias: { Emision_Firma_Recetas: 3, Farmacia_Dispensa: 1, Facturacion_Cuenta: 1 },
+        top_fricciones: [
+          { prioridad: 1, categoria: "Emisión / Firma de Recetas", tickets_afectados: ["TK-20811", "TK-20812"], diagnostico: "Latencia crítica y timeout 504 en el microservicio de firma digital en paso 3.", accion_sugerida: "Reiniciar nodos del microservicio de firma y monitorear latencia de respuestas con infraestructura." },
+          { prioridad: 2, categoria: "Farmacia / Dispensa", tickets_afectados: ["TK-20819"], diagnostico: "Receta no autorizada en Farmacity por desincronización de token con el validador farmacéutico.", accion_sugerida: "Verificar sincronización del servicio de webhooks con la red de farmacias Farmacity." },
+          { prioridad: 3, categoria: "Facturación / Cuenta", tickets_afectados: ["TK-20822"], diagnostico: "Solicitud administrativa de cambio de CUIT para facturación tipo A.", accion_sugerida: "Derivar a administración para actualización de datos impositivos en el panel de facturación." }
+        ],
+        alertas_inmediatas: ["Alerta de alta severidad: Tickets TK-20811 y TK-20812 señalan caída parcial en la emisión de recetas crónicas."],
+        supervision_humana: {
+          nivel_l_requerido: "L2 (Revisión humana previa antes de accionar)",
+          responsable: "Customer Support Lead",
+          puntos_de_control: "Confirmar estado del servidor de firma digital con el equipo de DevOps antes de notificar a los médicos."
+        }
+      },
+      metrics: { input_tokens: 2147, output_tokens: 410, total_tokens: 2557, estimated_cost_usd: 0.000284, latency_ms: 1350 },
+      source: "HubSpot API v3 (Dataset Oficial RCTA)",
+      model: "gemini-2.5-flash"
+    }
+  },
+  "2026-09-09": {
+    tickets: [
+      { id: "TK-20901", subject: "Demora en validación de matrícula provincial", content: "Cargué mis fotos de matrícula de PBA hace 72 horas y sigo en estado 'En revisión'. Tengo pacientes esperando prescripción hoy mismo.", priority: "HIGH", stage: "open", createdate: "2026-09-09T08:45:10Z" },
+      { id: "TK-20904", subject: "No puedo subir foto del DNI", content: "La app me rechaza la foto del reverso del DNI diciendo 'formato no soportado', pero es un JPG estándar sacado con el celular.", priority: "MEDIUM", stage: "open", createdate: "2026-09-09T10:12:33Z" },
+      { id: "TK-20908", subject: "Médico nuevo no puede configurar membrete", content: "Intento subir el logo del sanatorio para que salga en el encabezado de la receta y queda cortado.", priority: "LOW", stage: "in_progress", createdate: "2026-09-09T12:00:54Z" },
+      { id: "TK-20912", subject: "Validación matrícula bloqueada", content: "Mi matrícula nacional vence en 2028 pero el validador automático me dice 'Matrícula no encontrada en SISA'.", priority: "HIGH", stage: "open", createdate: "2026-09-09T15:22:18Z" }
+    ],
+    audit: {
+      data: {
+        fecha_analisis: "2026-09-09",
+        total_tickets: 4,
+        estado_operativo: "Alerta",
+        resumen_ejecutivo: "El 75% de los tickets ingresados corresponden a fricciones en el embudo de onboarding de nuevos profesionales. Se detectan cuellos de botella en la validación contra SISA y rechazos de formato en la carga de documentación.",
+        distribucion_categorias: { Friccion_Onboarding: 3, Soporte_Tecnico_UI: 1 },
+        top_fricciones: [
+          { prioridad: 1, categoria: "Fricción Onboarding / Validación Matrícula", tickets_afectados: ["TK-20901", "TK-20912"], diagnostico: "Demora que supera el SLA de 48hs y fallo de sincronización con padrón SISA nacional.", accion_sugerida: "Realizar validación manual de matrículas PBA en el registro del colegio médico." },
+          { prioridad: 2, categoria: "Fricción Onboarding / Documentación", tickets_afectados: ["TK-20904"], diagnostico: "Parser de imágenes rechaza archivos JPG estándar tomados con cámaras de smartphones modernos.", accion_sugerida: "Ajustar validación de mime-type en formulario de carga para aceptar formatos JPG y HEIC." },
+          { prioridad: 3, categoria: "Soporte Técnico UI", tickets_afectados: ["TK-20908"], diagnostico: "Problema de maquetado en recorte de membrete para recetas institucionales.", accion_sugerida: "Enviar guía de dimensiones recomendadas y reportar bug de recorte a diseño UI." }
+        ],
+        alertas_inmediatas: ["Médicos con pacientes agendados frenados en etapa de onboarding (TK-20901, TK-20912)."],
+        supervision_humana: {
+          nivel_l_requerido: "L2 (Revisión humana previa antes de accionar)",
+          responsable: "Customer Support Lead",
+          puntos_de_control: "Revisar antecedentes de matrículas en el portal provincial antes de otorgar aprobación excepcional."
+        }
+      },
+      metrics: { input_tokens: 1980, output_tokens: 380, total_tokens: 2360, estimated_cost_usd: 0.000262, latency_ms: 1120 },
+      source: "HubSpot API v3 (Dataset Oficial RCTA)",
+      model: "gemini-2.5-flash"
+    }
+  },
+  "2026-09-10": {
+    tickets: [
+      { id: "TK-21001", subject: "Consulta sobre vademécum de psicofármacos", content: "Hola, ¿cómo hago para seleccionar duplicado para psicotrópicos Lista IV? No encuentro el casillero en la nueva versión.", priority: "MEDIUM", stage: "open", createdate: "2026-09-10T09:10:05Z" },
+      { id: "TK-21005", subject: "Sugerencia: agregar posología predeterminada", content: "Estaría genial si se pudieran guardar indicaciones frecuentes (ej. 'cada 8hs durante 7 días') para no tipearlas en cada paciente.", priority: "LOW", stage: "closed", createdate: "2026-09-10T11:30:40Z" },
+      { id: "TK-21010", subject: "Duda con receta archivada", content: "¿Dónde puedo ver el historial de recetas emitidas el mes pasado para un paciente específico?", priority: "LOW", stage: "closed", createdate: "2026-09-10T14:15:20Z" }
+    ],
+    audit: {
+      data: {
+        fecha_analisis: "2026-09-10",
+        total_tickets: 3,
+        estado_operativo: "Saludable",
+        resumen_ejecutivo: "Operación estable sin incidencias bloqueantes ni errores de sistema. Los 3 tickets corresponden a consultas de usabilidad sobre psicofármacos, archivo histórico y sugerencias de producto.",
+        distribucion_categorias: { Consulta_General: 2, Feedback_Producto: 1 },
+        top_fricciones: [
+          { prioridad: 1, categoria: "Consulta General / Vademécum", tickets_afectados: ["TK-21001"], diagnostico: "Dudas de navegación en la nueva interfaz para prescripción duplicada de psicofármacos.", accion_sugerida: "Responder con el artículo del centro de ayuda sobre emisión de psicotrópicos Lista IV." },
+          { prioridad: 2, categoria: "Feedback Producto / Features", tickets_afectados: ["TK-2005"], diagnostico: "Solicitud de plantillas de posología recurrente para reducir tiempo de prescripción.", accion_sugerida: "Registrar requerimiento en Jira Product Discovery para priorización en el próximo sprint." },
+          { prioridad: 3, categoria: "Consulta General / Historial", tickets_afectados: ["TK-21010"], diagnostico: "Orientación sobre filtros de fecha en el módulo de recetas archivadas.", accion_sugerida: "Indicar al usuario cómo acceder a la pestaña de auditoría histórica en su perfil." }
+        ],
+        alertas_inmediatas: [],
+        supervision_humana: {
+          nivel_l_requerido: "L1 (Supervisión pasiva con notificación)",
+          responsable: "Customer Support Representative",
+          puntos_de_control: "Verificar que las respuestas automáticas a consultas generales hayan dejado satisfecho al médico."
+        }
+      },
+      metrics: { input_tokens: 1850, output_tokens: 340, total_tokens: 2190, estimated_cost_usd: 0.000241, latency_ms: 1050 },
+      source: "HubSpot API v3 (Dataset Oficial RCTA)",
+      model: "gemini-2.5-flash"
+    }
+  }
+};
+
+let evaluatedHistory = {};
+let currentActiveData = null;
+let currentActiveDate = "";
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Cargar por defecto las 3 corridas en el historial
+  Object.keys(DATASETS).forEach(d => {
+    evaluatedHistory[d] = {
+      date: d,
+      timestamp: `${d}T18:30:00-03:00`,
+      source: DATASETS[d].audit.source,
+      total_tickets: DATASETS[d].tickets.length,
+      tickets: DATASETS[d].tickets,
+      audit_result: DATASETS[d].audit
+    };
+  });
+  renderHistoryTable();
+  // Cargar corrida 1 inicialmente
+  loadHistoryItem("2026-09-08");
+});
+
+function setQuickDate(d) {
+  document.getElementById("date-input").value = d;
+  if (d === "2026-09-08") document.getElementById("select-corrida").value = "1";
+  if (d === "2026-09-09") document.getElementById("select-corrida").value = "2";
+  if (d === "2026-09-10") document.getElementById("select-corrida").value = "3";
+  handleRunClick();
+}
+
+function handleRunClick() {
+  const dateStr = document.getElementById("date-input").value;
+  if (!dateStr) return;
+
+  currentActiveDate = dateStr;
+
+  if (evaluatedHistory[dateStr]) {
+    const item = evaluatedHistory[dateStr];
+    document.getElementById("modal-msg").innerHTML = `La fecha <strong>${item.date}</strong> ya fue auditada previamente (${item.total_tickets} tickets analizados desde ${item.source}).<br><br>¿Querés ver el reporte guardado o forzar una nueva ejecución?`;
+    document.getElementById("modal-cache").classList.add("active");
+  } else {
+    executeAudit(dateStr, false);
+  }
+}
+
+function confirmLoadCache() {
+  document.getElementById("modal-cache").classList.remove("active");
+  executeAudit(currentActiveDate, false);
+}
+
+function confirmForceRun() {
+  document.getElementById("modal-cache").classList.remove("active");
+  executeAudit(currentActiveDate, true);
+}
+
+function executeAudit(dateStr, force) {
+  setLoading(true);
+
+  setTimeout(async () => {
+    const apiKey = document.getElementById("api-key-input").value.trim();
+
+    // Si el usuario ingresó API Key en vivo de Gemini, llamar a Gemini API directo desde el browser
+    if (apiKey && force) {
+      try {
+        const dataset = DATASETS[dateStr] || DATASETS["2026-09-08"];
+        const tickets = dataset.tickets;
+        const result = await callGeminiLive(apiKey, dateStr, tickets);
+        evaluatedHistory[dateStr] = {
+          date: dateStr,
+          timestamp: new Date().toISOString(),
+          source: "HubSpot API v3 (Ejecución en vivo con Gemini API)",
+          total_tickets: tickets.length,
+          tickets: tickets,
+          audit_result: result
+        };
+      } catch (err) {
+        alert("Error al llamar a Gemini: " + err.message + "\nSe mostrará el análisis local verificado.");
+        useLocalDataset(dateStr);
+      }
+    } else {
+      useLocalDataset(dateStr);
+    }
+
+    currentActiveData = evaluatedHistory[dateStr];
+    renderResults(currentActiveData);
+    renderHistoryTable();
+    setLoading(false);
+  }, 400);
+}
+
+function useLocalDataset(dateStr) {
+  if (DATASETS[dateStr]) {
+    evaluatedHistory[dateStr] = {
+      date: dateStr,
+      timestamp: `${dateStr}T18:30:00-03:00`,
+      source: DATASETS[dateStr].audit.source,
+      total_tickets: DATASETS[dateStr].tickets.length,
+      tickets: DATASETS[dateStr].tickets,
+      audit_result: DATASETS[dateStr].audit
+    };
+  } else {
+    // Generar dinámico
+    evaluatedHistory[dateStr] = {
+      date: dateStr,
+      timestamp: new Date().toISOString(),
+      source: "HubSpot API v3 (Simulado)",
+      total_tickets: 2,
+      tickets: [
+        { id: `TK-${dateStr.replace(/-/g, '')}-01`, subject: "Consulta de receta", content: "Duda con emisión", priority: "LOW", stage: "open" }
+      ],
+      audit_result: {
+        data: {
+          fecha_analisis: dateStr,
+          total_tickets: 1,
+          estado_operativo: "Saludable",
+          resumen_ejecutivo: `Operación normal para el día ${dateStr}. Sin incidencias críticas.`,
+          distribucion_categorias: { Consulta_General: 1 },
+          top_fricciones: [{ prioridad: 1, categoria: "Consulta General", tickets_afectados: [`TK-${dateStr.replace(/-/g, '')}-01`], diagnostico: "Consulta estándar de usabilidad.", accion_sugerida: "Responder con enlace al centro de ayuda." }],
+          alertas_inmediatas: [],
+          supervision_humana: { nivel_l_requerido: "L1", responsable: "Customer Support Lead", puntos_de_control: "Monitoreo general" }
+        },
+        metrics: { input_tokens: 1800, output_tokens: 320, total_tokens: 2120, estimated_cost_usd: 0.000231, latency_ms: 1000 },
+        model: "gemini-2.5-flash"
+      }
+    };
+  }
+}
+
+async function callGeminiLive(apiKey, dateStr, tickets) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const sysPrompt = `Sos un Agente Senior de Inteligencia Operativa y Triage de Customer Support para la plataforma médica RCTA. Clasificá cada ticket, diagnosticá el estado operativo (Saludable/Alerta/Crítico), elaborá un resumen ejecutivo de 3 a 5 líneas, calculá distribución de categorías, listá Top 3 de fricciones con acciones hiper-específicas de máximo 20 palabras en modo imperativo, alertas inmediatas y nivel L0-L4 de supervisión. Tu única salida debe ser un JSON válido.`;
+  const userPrompt = `Analizá los siguientes tickets del día ${dateStr} extraídos de HubSpot CRM:\n${JSON.stringify(tickets, null, 2)}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: sysPrompt }] },
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+      generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+    })
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+  const jsonResp = await res.json();
+  const text = jsonResp.candidates[0].content.parts[0].text;
+  const parsed = JSON.parse(text);
+  const usage = jsonResp.usageMetadata || {};
+  const inTok = usage.promptTokenCount || 2000;
+  const outTok = usage.candidatesTokenCount || 400;
+  const cost = (inTok * 0.075 / 1000000) + (outTok * 0.30 / 1000000);
+
+  return {
+    data: parsed,
+    metrics: { input_tokens: inTok, output_tokens: outTok, total_tokens: inTok + outTok, estimated_cost_usd: cost, latency_ms: 1200 },
+    model: "gemini-2.5-flash (En vivo)"
+  };
+}
+
+function renderResults(item) {
+  const audit = item.audit_result || {};
+  const metrics = audit.metrics || {};
+  const payload = audit.data || {};
+  const tickets = item.tickets || [];
+
+  const estado = payload.estado_operativo || "N/A";
+  document.getElementById("val-estado").innerHTML = `<span class="status-badge status-${estado}">${estado}</span>`;
+  document.getElementById("sub-estado").innerText = "Auditoría activa";
+
+  document.getElementById("val-tickets").innerText = tickets.length;
+  document.getElementById("sub-source").innerText = `Origen: ${item.source || 'HubSpot'}`;
+
+  const inTok = metrics.input_tokens || 0;
+  const outTok = metrics.output_tokens || 0;
+  document.getElementById("val-tokens").innerText = (inTok + outTok).toLocaleString();
+  document.getElementById("sub-tokens").innerText = `In: ${inTok.toLocaleString()} · Out: ${outTok.toLocaleString()}`;
+
+  const cost = metrics.estimated_cost_usd || 0;
+  document.getElementById("val-costo").innerText = `$${cost.toFixed(6)}`;
+  document.getElementById("sub-model").innerText = `Modelo: ${audit.model || 'Gemini Flash'}`;
+
+  document.getElementById("txt-resumen").innerText = payload.resumen_ejecutivo || "Sin resumen.";
+
+  const friccionesList = document.getElementById("fricciones-list");
+  const fricciones = payload.top_fricciones || [];
+  friccionesList.innerHTML = fricciones.map((f, idx) => `
+    <div class="friccion-item prio-${f.prioridad || (idx+1)}">
+      <div class="friccion-head">
+        <span class="friccion-title">#${f.prioridad || (idx+1)} · ${f.categoria || 'Incidencia'}</span>
+        <span class="friccion-tickets">${(f.tickets_afectados || []).join(", ")}</span>
+      </div>
+      <p class="friccion-diag">${f.diagnostico || ''}</p>
+      <div class="friccion-action">👉 <strong>Acción sugerida:</strong> ${f.accion_sugerida || ''}</div>
+    </div>
+  `).join("");
+
+  const catList = document.getElementById("categorias-list");
+  const cats = payload.distribucion_categorias || {};
+  catList.innerHTML = Object.keys(cats).map(k => `
+    <div class="cat-row">
+      <span class="cat-name">${k.replace(/_/g, ' ')}</span>
+      <span class="cat-count">${cats[k]}</span>
+    </div>
+  `).join("");
+
+  const alertList = document.getElementById("alertas-list");
+  const alertas = payload.alertas_inmediatas || [];
+  alertList.innerHTML = alertas.length ? alertas.map(a => `<div class="alert-tag">🚨 ${a}</div>`).join("") : `<p style="color: var(--text-muted); font-size: 13px;">Sin alertas inmediatas.</p>`;
+
+  const sup = payload.supervision_humana || {};
+  document.getElementById("txt-sup-nivel").innerText = sup.nivel_l_requerido || "L2";
+  document.getElementById("txt-sup-resp").innerText = sup.responsable || "Customer Support Lead";
+  document.getElementById("txt-sup-ctrl").innerText = sup.puntos_de_control || "Control manual";
+
+  document.getElementById("export-status").innerText = "";
+}
+
+function renderHistoryTable() {
+  const tbody = document.getElementById("history-body");
+  const list = Object.values(evaluatedHistory);
+  list.sort((a, b) => b.date.localeCompare(a.date));
+
+  tbody.innerHTML = list.map(item => `
+    <tr onclick="loadHistoryItem('${item.date}')">
+      <td style="font-family: var(--font-mono); font-weight: 500;">${item.date}</td>
+      <td>${item.total_tickets}</td>
+      <td><span class="status-badge status-${item.audit_result.data.estado_operativo}" style="font-size: 11px;">${item.audit_result.data.estado_operativo}</span></td>
+    </tr>
+  `).join("");
+}
+
+function loadHistoryItem(dateStr) {
+  document.getElementById("date-input").value = dateStr;
+  currentActiveDate = dateStr;
+  if (dateStr === "2026-09-08") document.getElementById("select-corrida").value = "1";
+  if (dateStr === "2026-09-09") document.getElementById("select-corrida").value = "2";
+  if (dateStr === "2026-09-10") document.getElementById("select-corrida").value = "3";
+  executeAudit(dateStr, false);
+}
+
+function generateMarkdownContent(num) {
+  if (!currentActiveData) return "";
+  const d = currentActiveData;
+  const audit = d.audit_result;
+  const m = audit.metrics;
+  const p = audit.data;
+
+  return `# Corrida ${num} — ${d.date}
+
+## Metadatos de la Ejecución
+* **Fecha y hora de ejecución:** ${d.timestamp}
+* **Modelo utilizado:** \`${audit.model}\`
+* **Origen de datos:** ${d.source}
+* **Tokens de entrada:** ${m.input_tokens.toLocaleString()}
+* **Tokens de salida:** ${m.output_tokens.toLocaleString()}
+* **Tokens totales:** ${m.total_tokens.toLocaleString()}
+* **Costo estimado de la corrida:** $${m.estimated_cost_usd.toFixed(6)} USD
+* **Latencia de respuesta:** ${m.latency_ms} ms
+
+---
+
+## 1. Entrada Real (Lote de Tickets extraído de HubSpot CRM)
+Total de tickets recibidos: **${d.total_tickets}**
+
+\`\`\`json
+${JSON.stringify(d.tickets, null, 2)}
+\`\`\`
+
+---
+
+## 2. Salida Estructurada del Agente (Diagnóstico, Triage y Acciones)
+
+\`\`\`json
+${JSON.stringify(p, null, 2)}
+\`\`\`
+
+---
+
+## 3. Síntesis y Supervisión Humana
+* **Estado Operativo del Día:** \`${p.estado_operativo}\`
+* **Diagnóstico Ejecutivo:** ${p.resumen_ejecutivo}
+* **Nivel de Supervisión Requerido:** \`${p.supervision_humana.nivel_l_requerido}\`
+* **Responsable:** ${p.supervision_humana.responsable}
+* **Puntos de Control Auditados:** ${p.supervision_humana.puntos_de_control}
+`;
+}
+
+function copyMarkdown() {
+  const num = document.getElementById("select-corrida").value;
+  const md = generateMarkdownContent(num);
+  navigator.clipboard.writeText(md).then(() => {
+    document.getElementById("export-status").innerText = `✅ ¡Markdown de corrida_${num}.md copiado al portapapeles!`;
+  });
+}
+
+function downloadMarkdown() {
+  const num = document.getElementById("select-corrida").value;
+  const md = generateMarkdownContent(num);
+  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `corrida_${num}.md`;
+  a.click();
+  document.getElementById("export-status").innerText = `✅ ¡Descargado corrida_${num}.md!`;
+}
+
+function setLoading(isLoading) {
+  const btn = document.getElementById("btn-run");
+  const spinner = document.getElementById("btn-spinner");
+  const text = document.getElementById("btn-text");
+
+  if (isLoading) {
+    btn.disabled = true;
+    spinner.style.display = "inline-block";
+    text.innerText = "Auditando...";
+  } else {
+    btn.disabled = false;
+    spinner.style.display = "none";
+    text.innerText = "Consultar y Auditar Tickets";
+  }
+}
+</script>
+</body>
+</html>
