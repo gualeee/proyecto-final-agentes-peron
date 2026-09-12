@@ -127,6 +127,135 @@
     }
     input[type="date"]:focus, input[type="password"]:focus { border-color: var(--accent); }
 
+    .btn-calendar-trigger {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      color: var(--text-bright);
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-width: 170px;
+    }
+    .btn-calendar-trigger:hover {
+      border-color: var(--accent);
+      background: #161b22;
+    }
+    .btn-calendar-trigger .cal-icon { font-size: 16px; }
+    .btn-calendar-trigger .cal-display { font-weight: 500; }
+    .btn-calendar-trigger .cal-arrow { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+    /* Estilos del Calendario Interactivo */
+    .cal-header-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .cal-month-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    .cal-grid-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .cal-grid-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .cal-day:hover {
+      border-color: var(--accent);
+      background: #1c2128;
+      color: var(--text-bright);
+    }
+    .cal-day.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+    .cal-day.selected {
+      background: var(--accent);
+      color: #0d1117;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+    .cal-day.has-data::after {
+      content: "";
+      position: absolute;
+      bottom: 3px;
+      width: 5px;
+      height: 5px;
+      background: #3fb950;
+      border-radius: 50%;
+    }
+    .cal-day.selected.has-data::after {
+      background: #0d1117;
+    }
+    .cal-day.today {
+      border-color: rgba(88, 166, 255, 0.6);
+    }
+    .cal-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .cal-chip {
+      background: #21262d;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cal-chip:hover {
+      border-color: var(--accent);
+      color: var(--text-bright);
+      background: #30363d;
+    }
+    .cal-chip.active {
+      border-color: var(--accent);
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
     .btn-primary {
       background: var(--accent);
       color: #0d1117;
@@ -431,11 +560,66 @@
     </div>
   </div>
 
+  <!-- Modal Selector de Fecha y Calendario -->
+  <div id="modal-calendar" class="modal-overlay">
+    <div class="modal-box" style="max-width: 440px; border-color: var(--accent);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 14px;">
+        <h3 style="color: var(--accent); margin: 0; font-size: 17px; display: flex; align-items: center; gap: 8px;">
+          📅 Seleccionar Fecha a Auditar
+        </h3>
+        <button type="button" onclick="closeCalendarModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px 8px;">✕</button>
+      </div>
+
+      <!-- Atajos Rápidos -->
+      <div class="cal-quick-chips">
+        <span style="font-size: 11px; color: var(--text-muted); width: 100%; font-family: var(--font-mono); margin-bottom: 2px;">ACCESOS RÁPIDOS:</span>
+        <button type="button" class="cal-chip" onclick="selectQuickChip('2026-09-11')">Ayer (11/09)</button>
+        <button type="button" class="cal-chip" onclick="selectQuickChip('2026-09-12')">Hoy (12/09)</button>
+        <button type="button" class="cal-chip" onclick="selectQuickChip('2026-09-10')">10/09 (Corrida 3)</button>
+        <button type="button" class="cal-chip" onclick="selectQuickChip('2026-09-09')">09/09 (Corrida 2)</button>
+        <button type="button" class="cal-chip" onclick="selectQuickChip('2026-09-08')">08/09 (Corrida 1)</button>
+      </div>
+
+      <!-- Navegación de Mes -->
+      <div class="cal-header-nav">
+        <button type="button" class="btn-secondary" onclick="changeCalMonth(-1)" style="padding: 4px 10px; font-size: 12px;">◀ Anterior</button>
+        <span id="cal-month-title" class="cal-month-title">Septiembre 2026</span>
+        <button type="button" class="btn-secondary" onclick="changeCalMonth(1)" style="padding: 4px 10px; font-size: 12px;">Siguiente ▶</button>
+      </div>
+
+      <!-- Cabecera Días -->
+      <div class="cal-grid-header">
+        <div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sá</div><div>Do</div>
+      </div>
+
+      <!-- Cuadrícula Días -->
+      <div id="cal-grid-days" class="cal-grid-days">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">
+          Seleccionada: <strong id="cal-selected-preview" style="color: var(--accent);">11/09/2026</strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-secondary" onclick="closeCalendarModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="confirmCalendarSelection(false)">Confirmar</button>
+          <button type="button" class="btn-primary" onclick="confirmCalendarSelection(true)" style="background: var(--success);" title="Confirmar y ejecutar análisis inmediatamente">Auditar ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Panel de Control -->
   <div class="control-panel">
     <div class="form-group">
-      <label for="date-input">Fecha a Auditar</label>
-      <input type="date" id="date-input" value="2026-09-08">
+      <label>Fecha a Auditar</label>
+      <button type="button" class="btn-calendar-trigger" id="btn-open-calendar" onclick="openCalendarModal()" title="Hacé clic para elegir fecha en el calendario">
+        <span class="cal-icon">📅</span>
+        <span id="selected-date-display" class="cal-display">11/09/2026</span>
+        <span class="cal-arrow">▾</span>
+      </button>
+      <input type="hidden" id="date-input" value="2026-09-11">
     </div>
 
     <div class="form-group" style="flex: 1; min-width: 240px;">
@@ -449,10 +633,11 @@
     </button>
 
     <div class="quick-dates">
-      <span>Fechas del TP:</span>
-      <button class="btn-secondary" onclick="setQuickDate('2026-09-08')">08/09 (Corrida 1)</button>
-      <button class="btn-secondary" onclick="setQuickDate('2026-09-09')">09/09 (Corrida 2)</button>
-      <button class="btn-secondary" onclick="setQuickDate('2026-09-10')">10/09 (Corrida 3)</button>
+      <span>Accesos directos:</span>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-11')">Ayer (11/09)</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-08')">08/09</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-09')">09/09</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-10')">10/09</button>
     </div>
   </div>
 
@@ -804,29 +989,153 @@ async function testHubspotDirect() {
   }
 }
 
-async function testN8nDirect() {
-  const url = document.getElementById("cfg-n8n-url").value.trim() || localStorage.getItem("N8N_URL");
-  const statusEl = document.getElementById("cfg-n8n-status");
-  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando n8n webhook...</span>";
+// --- Calendario y Selector de Fechas Interactivo ---
+const MONTH_NAMES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
-  if (!url) {
-    statusEl.innerHTML = "<span style='color: var(--danger);'>Ingresá la URL del webhook</span>";
-    return;
+let calYear = 2026;
+let calMonth = 8; // 8 = Septiembre (0-indexed)
+let calSelected = "2026-09-11";
+const DATES_WITH_DATA = ["2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-12"];
+
+function formatDateDisplay(isoStr) {
+  if (!isoStr) return "Seleccionar Fecha";
+  const parts = isoStr.split("-");
+  if (parts.length !== 3) return isoStr;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function setDate(dateStr) {
+  if (!dateStr) return;
+  calSelected = dateStr;
+  const input = document.getElementById("date-input");
+  if (input) input.value = dateStr;
+  const display = document.getElementById("selected-date-display");
+  if (display) display.innerText = formatDateDisplay(dateStr);
+  const preview = document.getElementById("cal-selected-preview");
+  if (preview) preview.innerText = formatDateDisplay(dateStr);
+
+  const selCorrida = document.getElementById("select-corrida");
+  if (selCorrida) {
+    if (dateStr === "2026-09-08") selCorrida.value = "1";
+    if (dateStr === "2026-09-09") selCorrida.value = "2";
+    if (dateStr === "2026-09-10") selCorrida.value = "3";
   }
 
-  try {
-    const res = await fetch(url + "?test=ping");
-    statusEl.innerHTML = `<span style='color: var(--success);'>✅ Webhook respondió (HTTP ${res.status})</span>`;
-  } catch (err) {
-    statusEl.innerHTML = `<span style='color: var(--warning);'>⚠️ Verificá CORS en n8n si ejecutas desde file://, o usá iniciar_servidor.bat.</span>`;
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    calYear = parseInt(parts[0], 10);
+    calMonth = parseInt(parts[1], 10) - 1;
   }
 }
 
+function openCalendarModal() {
+  const currentVal = document.getElementById("date-input")?.value || "2026-09-11";
+  setDate(currentVal);
+  renderCalendar();
+  document.getElementById("modal-calendar").classList.add("active");
+}
+
+function closeCalendarModal() {
+  document.getElementById("modal-calendar").classList.remove("active");
+}
+
+function changeCalMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0) {
+    calMonth = 11;
+    calYear -= 1;
+  } else if (calMonth > 11) {
+    calMonth = 0;
+    calYear += 1;
+  }
+  renderCalendar();
+}
+
+function selectQuickChip(d) {
+  setDate(d);
+  renderCalendar();
+}
+
+function confirmCalendarSelection(andRun = false) {
+  setDate(calSelected);
+  closeCalendarModal();
+  if (andRun) {
+    handleRunClick();
+  }
+}
+
+function renderCalendar() {
+  const titleEl = document.getElementById("cal-month-title");
+  if (titleEl) {
+    titleEl.innerText = `${MONTH_NAMES[calMonth]} ${calYear}`;
+  }
+
+  const gridEl = document.getElementById("cal-grid-days");
+  if (!gridEl) return;
+  gridEl.innerHTML = "";
+
+  // Primer día de la semana (Lunes = 0, Domingo = 6)
+  const firstDay = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  // Espacios vacíos previos
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement("div");
+    empty.className = "cal-day empty";
+    gridEl.appendChild(empty);
+  }
+
+  // Días del mes
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayStr = String(day).padStart(2, "0");
+    const monthStr = String(calMonth + 1).padStart(2, "0");
+    const fullDate = `${calYear}-${monthStr}-${dayStr}`;
+
+    const cell = document.createElement("div");
+    cell.className = "cal-day";
+    cell.innerText = day;
+    cell.dataset.date = fullDate;
+
+    if (fullDate === calSelected) {
+      cell.classList.add("selected");
+    }
+
+    if (DATES_WITH_DATA.includes(fullDate)) {
+      cell.classList.add("has-data");
+      cell.title = "Día con tickets auditados / disponibles";
+    }
+
+    cell.addEventListener("click", () => {
+      calSelected = fullDate;
+      const preview = document.getElementById("cal-selected-preview");
+      if (preview) preview.innerText = formatDateDisplay(fullDate);
+      document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
+      cell.classList.add("selected");
+    });
+
+    cell.addEventListener("dblclick", () => {
+      calSelected = fullDate;
+      confirmCalendarSelection(false);
+    });
+
+    gridEl.appendChild(cell);
+  }
+
+  // Resaltar chips activos
+  document.querySelectorAll(".cal-chip").forEach(chip => {
+    if (chip.getAttribute("onclick")?.includes(calSelected)) {
+      chip.classList.add("active");
+    } else {
+      chip.classList.remove("active");
+    }
+  });
+}
+
 function setQuickDate(d) {
-  document.getElementById("date-input").value = d;
-  if (d === "2026-09-08") document.getElementById("select-corrida").value = "1";
-  if (d === "2026-09-09") document.getElementById("select-corrida").value = "2";
-  if (d === "2026-09-10") document.getElementById("select-corrida").value = "3";
+  setDate(d);
   handleRunClick();
 }
 
@@ -1032,11 +1341,8 @@ function renderHistoryTable() {
 }
 
 function loadHistoryItem(dateStr) {
-  document.getElementById("date-input").value = dateStr;
+  setDate(dateStr);
   currentActiveDate = dateStr;
-  if (dateStr === "2026-09-08") document.getElementById("select-corrida").value = "1";
-  if (dateStr === "2026-09-09") document.getElementById("select-corrida").value = "2";
-  if (dateStr === "2026-09-10") document.getElementById("select-corrida").value = "3";
   executeAudit(dateStr, false);
 }
 

@@ -2,6 +2,8 @@ let currentActiveData = null;
 let currentActiveDate = "";
 
 document.addEventListener("DOMContentLoaded", () => {
+  const initialDate = document.getElementById("date-input")?.value || "2026-09-11";
+  setDate(initialDate);
   loadHistory();
   loadConfigStatus();
 });
@@ -117,30 +119,146 @@ async function testHubspotConnection() {
   }
 }
 
-async function testN8nConnection() {
-  const url = document.getElementById("cfg-n8n-url").value.trim();
-  const statusEl = document.getElementById("cfg-n8n-status");
-  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando webhook n8n...</span>";
+// --- Calendario y Selector de Fechas Interactivo ---
+const MONTH_NAMES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
-  try {
-    const res = await fetch("/api/test_n8n", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url })
-    });
-    const data = await res.json();
-    if (res.ok && data.success) {
-      statusEl.innerHTML = `<span style='color: var(--success);'>✅ ${data.message}</span>`;
-    } else {
-      statusEl.innerHTML = `<span style='color: var(--danger);'>❌ Error: ${data.error}</span>`;
-    }
-  } catch (err) {
-    statusEl.innerHTML = `<span style='color: var(--danger);'>❌ ${err.message}</span>`;
+let calYear = 2026;
+let calMonth = 8; // 8 = Septiembre (0-indexed)
+let calSelected = "2026-09-11";
+const DATES_WITH_DATA = ["2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-12"];
+
+function formatDateDisplay(isoStr) {
+  if (!isoStr) return "Seleccionar Fecha";
+  const parts = isoStr.split("-");
+  if (parts.length !== 3) return isoStr;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function setDate(dateStr) {
+  if (!dateStr) return;
+  calSelected = dateStr;
+  const input = document.getElementById("date-input");
+  if (input) input.value = dateStr;
+  const display = document.getElementById("selected-date-display");
+  if (display) display.innerText = formatDateDisplay(dateStr);
+  const preview = document.getElementById("cal-selected-preview");
+  if (preview) preview.innerText = formatDateDisplay(dateStr);
+
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    calYear = parseInt(parts[0], 10);
+    calMonth = parseInt(parts[1], 10) - 1;
   }
 }
 
+function openCalendarModal() {
+  const currentVal = document.getElementById("date-input")?.value || "2026-09-11";
+  setDate(currentVal);
+  renderCalendar();
+  document.getElementById("modal-calendar").classList.add("active");
+}
+
+function closeCalendarModal() {
+  document.getElementById("modal-calendar").classList.remove("active");
+}
+
+function changeCalMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0) {
+    calMonth = 11;
+    calYear -= 1;
+  } else if (calMonth > 11) {
+    calMonth = 0;
+    calYear += 1;
+  }
+  renderCalendar();
+}
+
+function selectQuickChip(d) {
+  setDate(d);
+  renderCalendar();
+}
+
+function confirmCalendarSelection(andRun = false) {
+  setDate(calSelected);
+  closeCalendarModal();
+  if (andRun) {
+    handleRunClick();
+  }
+}
+
+function renderCalendar() {
+  const titleEl = document.getElementById("cal-month-title");
+  if (titleEl) {
+    titleEl.innerText = `${MONTH_NAMES[calMonth]} ${calYear}`;
+  }
+
+  const gridEl = document.getElementById("cal-grid-days");
+  if (!gridEl) return;
+  gridEl.innerHTML = "";
+
+  // Primer día de la semana (Lunes = 0, Domingo = 6)
+  const firstDay = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  // Espacios vacíos previos
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement("div");
+    empty.className = "cal-day empty";
+    gridEl.appendChild(empty);
+  }
+
+  // Días del mes
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayStr = String(day).padStart(2, "0");
+    const monthStr = String(calMonth + 1).padStart(2, "0");
+    const fullDate = `${calYear}-${monthStr}-${dayStr}`;
+
+    const cell = document.createElement("div");
+    cell.className = "cal-day";
+    cell.innerText = day;
+    cell.dataset.date = fullDate;
+
+    if (fullDate === calSelected) {
+      cell.classList.add("selected");
+    }
+
+    if (DATES_WITH_DATA.includes(fullDate)) {
+      cell.classList.add("has-data");
+      cell.title = "Día con tickets auditados / disponibles";
+    }
+
+    cell.addEventListener("click", () => {
+      calSelected = fullDate;
+      const preview = document.getElementById("cal-selected-preview");
+      if (preview) preview.innerText = formatDateDisplay(fullDate);
+      document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
+      cell.classList.add("selected");
+    });
+
+    cell.addEventListener("dblclick", () => {
+      calSelected = fullDate;
+      confirmCalendarSelection(false);
+    });
+
+    gridEl.appendChild(cell);
+  }
+
+  // Resaltar chips activos
+  document.querySelectorAll(".cal-chip").forEach(chip => {
+    if (chip.getAttribute("onclick")?.includes(calSelected)) {
+      chip.classList.add("active");
+    } else {
+      chip.classList.remove("active");
+    }
+  });
+}
+
 function setQuickDate(d) {
-  document.getElementById("date-input").value = d;
+  setDate(d);
   handleRunClick();
 }
 
@@ -333,7 +451,7 @@ async function loadHistory() {
 }
 
 function loadHistoryItem(dateStr) {
-  document.getElementById("date-input").value = dateStr;
+  setDate(dateStr);
   currentActiveDate = dateStr;
   executeAudit(dateStr, false);
 }
