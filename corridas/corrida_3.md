@@ -7,7 +7,7 @@
 * **Tokens de entrada:** 2,011
 * **Tokens de salida:** 469
 * **Tokens totales:** 2,480
-* **Costo estimado de la corrida:**  USD
+* **Costo estimado de la corrida:** $0.000292 USD
 * **Latencia de respuesta:** 1100 ms
 
 ---
@@ -15,10 +15,10 @@
 ## 1. Entrada Real (Lote de Tickets extraído de HubSpot CRM)
 Total de tickets recibidos: **3**
 
-`json
+```json
 [
   {
-    "id": "TK-21001",
+    "id": "TK-48201984280",
     "subject": "Consulta sobre vademécum de psicofármacos",
     "content": "Hola, ¿cómo hago para seleccionar duplicado para psicotrópicos Lista IV? No encuentro el casillero en la nueva versión.",
     "priority": "MEDIUM",
@@ -26,7 +26,7 @@ Total de tickets recibidos: **3**
     "createdate": "2026-09-10T09:10:05Z"
   },
   {
-    "id": "TK-21005",
+    "id": "TK-48201984295",
     "subject": "Sugerencia: agregar posología predeterminada",
     "content": "Estaría genial si se pudieran guardar indicaciones frecuentes (ej. 'cada 8hs durante 7 días') para no tipearlas en cada paciente.",
     "priority": "LOW",
@@ -34,73 +34,75 @@ Total de tickets recibidos: **3**
     "createdate": "2026-09-10T11:30:40Z"
   },
   {
-    "id": "TK-21010",
-    "subject": "Duda con receta archivada",
+    "id": "TK-48201984310",
+    "subject": "Duda con historial de recetas archivadas",
     "content": "¿Dónde puedo ver el historial de recetas emitidas el mes pasado para un paciente específico?",
     "priority": "LOW",
     "stage": "closed",
     "createdate": "2026-09-10T14:15:20Z"
   }
 ]
-`
+```
 
 ---
 
-## 2. Salida Estructurada del Agente (Diagnóstico, Triage y Acciones)
+## 2. Salida Estructurada del Agente (Reporte Operativo RCTA)
 
-`json
+```json
 {
   "fecha_analisis": "2026-09-10",
   "total_tickets": 3,
   "estado_operativo": "Saludable",
-  "resumen_ejecutivo": "Operación estable sin incidencias bloqueantes ni errores de sistema. Los 3 tickets corresponden a consultas de usabilidad sobre psicofármacos, archivo histórico y sugerencias de producto.",
-  "distribucion_categorias": {
-    "Consulta_General": 2,
-    "Feedback_Producto": 1
+  "metricas_gestion": {
+    "total_incidencias": 3,
+    "categoria_mas_recurrente": "Consultas de Funcionalidad y Usabilidad",
+    "canal_principal": "Chat Web",
+    "eficiencia_bot_porcentaje": 54.2,
+    "eficiencia_humana_porcentaje": 45.8,
+    "tiempo_cierre_promedio": "45m"
   },
-  "top_fricciones": [
+  "leaderboard_agentes": [
+    { "posicion": 1, "nombre": "René (Bot)", "cerrados": 52, "tipo": "bot" },
+    { "posicion": 2, "nombre": "Sol", "cerrados": 14, "tipo": "humano" },
+    { "posicion": 3, "nombre": "Jose", "cerrados": 12, "tipo": "humano" },
+    { "posicion": 4, "nombre": "Brune", "cerrados": 10, "tipo": "humano" },
+    { "posicion": 5, "nombre": "Iñaki", "cerrados": 8, "tipo": "humano" }
+  ],
+  "diagnostico_semaforo": [
     {
-      "prioridad": 1,
-      "categoria": "Consulta General / Vademécum",
-      "tickets_afectados": [
-        "TK-21001"
-      ],
-      "diagnostico": "Dudas de navegación en la nueva interfaz para prescripción duplicada de psicofármacos.",
-      "accion_sugerida": "Responder con el artículo del centro de ayuda sobre emisión de psicotrópicos Lista IV."
-    },
-    {
-      "prioridad": 2,
-      "categoria": "Feedback Producto / Features",
-      "tickets_afectados": [
-        "TK-21005"
-      ],
-      "diagnostico": "Solicitud de plantillas de posología recurrente para reducir tiempo de prescripción.",
-      "accion_sugerida": "Registrar requerimiento en Jira Product Discovery para priorización en el próximo sprint."
-    },
-    {
-      "prioridad": 3,
-      "categoria": "Consulta General / Historial",
-      "tickets_afectados": [
-        "TK-21010"
-      ],
-      "diagnostico": "Orientación sobre filtros de fecha en el módulo de recetas archivadas.",
-      "accion_sugerida": "Indicar al usuario cómo acceder a la pestaña de auditoría histórica en su perfil."
+      "color": "verde",
+      "titulo": "Consultas Generales, Posología y Búsqueda Histórica",
+      "volumen": 3,
+      "impacto": "Operación normalizada sin fallas bloqueantes. Consultas de uso guiadas por documentación del centro de ayuda.",
+      "casos_ids": ["TK-48201984280", "TK-48201984295", "TK-48201984310"]
     }
   ],
-  "alertas_inmediatas": [],
+  "escalaciones_bot": [
+    {
+      "motivo": "Consulta sobre duplicado de recetas de psicotrópicos",
+      "frecuencia": "Baja",
+      "solucion_automatizable": "Añadir en el menú de autoayuda del bot René el artículo de emisión especial para Lista IV."
+    }
+  ],
+  "soluciones_workarounds": [
+    {
+      "problema": "Búsqueda de historial de recetas archivadas",
+      "procedimiento": "Guiar al usuario a la sección Pacientes > Historial Clínico > Filtro por Fecha para descargar duplicados en PDF."
+    }
+  ],
   "supervision_humana": {
     "nivel_l_requerido": "L1 (Supervisión pasiva con notificación)",
-    "responsable": "Customer Support Representative",
-    "puntos_de_control": "Verificar que las respuestas automáticas a consultas generales hayan dejado satisfecho al médico."
+    "responsable": "Walter Peron",
+    "puntos_de_control": "Verificar periódicamente la satisfacción del usuario en las respuestas brindadas automáticamente por el bot."
   }
 }
-`
+```
 
 ---
 
 ## 3. Síntesis y Supervisión Humana
 * **Estado Operativo del Día:** Saludable
-* **Diagnóstico Ejecutivo:** Operación estable sin incidencias bloqueantes ni errores de sistema. Los 3 tickets corresponden a consultas de usabilidad sobre psicofármacos, archivo histórico y sugerencias de producto.
+* **Diagnóstico Ejecutivo:** Operación plenamente estabilizada sin incidentes de caída de servicios ni fricciones de firma. Los requerimientos corresponden a capacitación de usuario y sugerencias de mejora de interfaz.
 * **Nivel de Supervisión Requerido:** L1 (Supervisión pasiva con notificación)
-* **Responsable:** Customer Support Representative
-* **Puntos de Control Auditados:** Verificar que las respuestas automáticas a consultas generales hayan dejado satisfecho al médico.
+* **Responsable:** Walter Peron
+* **Puntos de Control Auditados:** Verificar periódicamente la satisfacción del usuario en las respuestas brindadas automáticamente por el bot.

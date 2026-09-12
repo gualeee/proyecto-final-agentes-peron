@@ -7,7 +7,7 @@
 * **Tokens de entrada:** 2,102
 * **Tokens de salida:** 511
 * **Tokens totales:** 2,613
-* **Costo estimado de la corrida:**  USD
+* **Costo estimado de la corrida:** $0.000311 USD
 * **Latencia de respuesta:** 1100 ms
 
 ---
@@ -15,103 +15,116 @@
 ## 1. Entrada Real (Lote de Tickets extraído de HubSpot CRM)
 Total de tickets recibidos: **4**
 
-`json
+```json
 [
   {
-    "id": "TK-20901",
-    "subject": "Demora en validación de matrícula provincial",
-    "content": "Cargué mis fotos de matrícula de PBA hace 72 horas y sigo en estado 'En revisión'. Tengo pacientes esperando prescripción hoy mismo.",
+    "id": "TK-48264175710",
+    "subject": "Crash de aplicación al iniciar sesión con huella",
+    "content": "Reportan varios usuarios que la versión 4.2.1 se cierra inesperadamente en terminales Samsung A52 con Android 13.",
     "priority": "HIGH",
     "stage": "open",
     "createdate": "2026-09-09T08:45:10Z"
   },
   {
-    "id": "TK-20904",
-    "subject": "No puedo subir foto del DNI",
-    "content": "La app me rechaza la foto del reverso del DNI diciendo 'formato no soportado', pero es un JPG estándar sacado con el celular.",
-    "priority": "MEDIUM",
+    "id": "TK-48096653801",
+    "subject": "Validación matrícula PBA demora más de 48hs",
+    "content": "Cargué la matrícula provincial de Buenos Aires hace 3 días y continúa en estado pendiente de verificación en SISA.",
+    "priority": "HIGH",
     "stage": "open",
     "createdate": "2026-09-09T10:12:33Z"
   },
   {
-    "id": "TK-20908",
-    "subject": "Médico nuevo no puede configurar membrete",
-    "content": "Intento subir el logo del sanatorio para que salga en el encabezado de la receta y queda cortado.",
-    "priority": "LOW",
-    "stage": "in_progress",
+    "id": "TK-48149811502",
+    "subject": "Webservice de OSDE no responde en autorizaciones",
+    "content": "Al prescribir medicamentos que requieren autorización previa, el sistema arroja error de conexión con el webservice de OSDE.",
+    "priority": "HIGH",
+    "stage": "open",
     "createdate": "2026-09-09T12:00:54Z"
   },
   {
-    "id": "TK-20912",
-    "subject": "Validación matrícula bloqueada",
-    "content": "Mi matrícula nacional vence en 2028 pero el validador automático me dice 'Matrícula no encontrada en SISA'.",
-    "priority": "HIGH",
-    "stage": "open",
+    "id": "TK-48201984255",
+    "subject": "Consulta sobre cambio de datos fiscales en factura",
+    "content": "Necesitamos actualizar la razón social y CUIT de la cuenta institucional para la próxima factura mensual.",
+    "priority": "LOW",
+    "stage": "closed",
     "createdate": "2026-09-09T15:22:18Z"
   }
 ]
-`
+```
 
 ---
 
-## 2. Salida Estructurada del Agente (Diagnóstico, Triage y Acciones)
+## 2. Salida Estructurada del Agente (Reporte Operativo RCTA)
 
-`json
+```json
 {
   "fecha_analisis": "2026-09-09",
   "total_tickets": 4,
   "estado_operativo": "Alerta",
-  "resumen_ejecutivo": "El 75% de los tickets ingresados corresponden a fricciones en el embudo de onboarding de nuevos profesionales. Se detectan cuellos de botella en la validación contra SISA y rechazos de formato en la carga de documentación.",
-  "distribucion_categorias": {
-    "Friccion_Onboarding": 3,
-    "Soporte_Tecnico_UI": 1
+  "metricas_gestion": {
+    "total_incidencias": 4,
+    "categoria_mas_recurrente": "Fricciones de Acceso y Validaciones Externas",
+    "canal_principal": "Chat Web",
+    "eficiencia_bot_porcentaje": 48.0,
+    "eficiencia_humana_porcentaje": 52.0,
+    "tiempo_cierre_promedio": "2h 10m"
   },
-  "top_fricciones": [
+  "leaderboard_agentes": [
+    { "posicion": 1, "nombre": "René (Bot)", "cerrados": 42, "tipo": "bot" },
+    { "posicion": 2, "nombre": "Sol", "cerrados": 18, "tipo": "humano" },
+    { "posicion": 3, "nombre": "Jose", "cerrados": 15, "tipo": "humano" },
+    { "posicion": 4, "nombre": "Brune", "cerrados": 11, "tipo": "humano" },
+    { "posicion": 5, "nombre": "Iñaki", "cerrados": 8, "tipo": "humano" }
+  ],
+  "diagnostico_semaforo": [
     {
-      "prioridad": 1,
-      "categoria": "Fricción Onboarding / Validación Matrícula",
-      "tickets_afectados": [
-        "TK-20901",
-        "TK-20912"
-      ],
-      "diagnostico": "Demora que supera el SLA de 48hs y fallo de sincronización con padrón SISA nacional.",
-      "accion_sugerida": "Realizar validación manual de matrículas PBA en el registro del colegio médico."
+      "color": "rojo",
+      "titulo": "Inestabilidad de WebServices Externos y Crash en Android 13",
+      "volumen": 2,
+      "impacto": "Fallo en conexión con servicio de OSDE que frena prescripciones y crash en inicio con biometría.",
+      "casos_ids": ["TK-48264175710", "TK-48149811502"]
     },
     {
-      "prioridad": 2,
-      "categoria": "Fricción Onboarding / Documentación",
-      "tickets_afectados": [
-        "TK-20904"
-      ],
-      "diagnostico": "Parser de imágenes rechaza archivos JPG estándar tomados con cámaras de smartphones modernos.",
-      "accion_sugerida": "Ajustar validación de mime-type en formulario de carga para aceptar formatos JPG y HEIC."
+      "color": "amarillo",
+      "titulo": "Demoras en Matrículas Provinciales contra Padrón SISA",
+      "volumen": 1,
+      "impacto": "Médicos habilitados no pueden comenzar a atender por retraso en el cruzamiento de datos de PBA.",
+      "casos_ids": ["TK-48096653801"]
     },
     {
-      "prioridad": 3,
-      "categoria": "Soporte Técnico UI",
-      "tickets_afectados": [
-        "TK-20908"
-      ],
-      "diagnostico": "Problema de maquetado en recorte de membrete para recetas institucionales.",
-      "accion_sugerida": "Enviar guía de dimensiones recomendadas y reportar bug de recorte a diseño UI."
+      "color": "verde",
+      "titulo": "Gestión Administrativa y Actualizaciones de Cuenta",
+      "volumen": 1,
+      "impacto": "Actualización regular de información impositiva de clientes corporativos.",
+      "casos_ids": ["TK-48201984255"]
     }
   ],
-  "alertas_inmediatas": [
-    "Médicos con pacientes agendados frenados en etapa de onboarding (TK-20901, TK-20912)."
+  "escalaciones_bot": [
+    {
+      "motivo": "Demora de validación de matrícula que supera el SLA",
+      "frecuencia": "Media",
+      "solucion_automatizable": "Conectar el bot René a la consulta directa del padrón REFEPS para brindar estado en tiempo real."
+    }
+  ],
+  "soluciones_workarounds": [
+    {
+      "problema": "Cierre abrupto al usar autenticación biométrica en Android",
+      "procedimiento": "Recomendar inicio de sesión provisorio mediante contraseña alfanumérica y desactivar biometría en ajustes."
+    }
   ],
   "supervision_humana": {
     "nivel_l_requerido": "L2 (Revisión humana previa antes de accionar)",
-    "responsable": "Customer Support Lead",
-    "puntos_de_control": "Revisar antecedentes de matrículas en el portal provincial antes de otorgar aprobación excepcional."
+    "responsable": "Walter Peron",
+    "puntos_de_control": "Revisar el registro de incidencias técnicas antes de autorizar habilitaciones manuales de matrículas."
   }
 }
-`
+```
 
 ---
 
 ## 3. Síntesis y Supervisión Humana
 * **Estado Operativo del Día:** Alerta
-* **Diagnóstico Ejecutivo:** El 75% de los tickets ingresados corresponden a fricciones en el embudo de onboarding de nuevos profesionales. Se detectan cuellos de botella en la validación contra SISA y rechazos de formato en la carga de documentación.
+* **Diagnóstico Ejecutivo:** El volumen de la jornada refleja bloqueos por caídas puntuales en el servicio de autorizaciones de OSDE e inestabilidad en la autenticación biométrica de terminales Android.
 * **Nivel de Supervisión Requerido:** L2 (Revisión humana previa antes de accionar)
-* **Responsable:** Customer Support Lead
-* **Puntos de Control Auditados:** Revisar antecedentes de matrículas en el portal provincial antes de otorgar aprobación excepcional.
+* **Responsable:** Walter Peron
+* **Puntos de Control Auditados:** Revisar el registro de incidencias técnicas antes de autorizar habilitaciones manuales de matrículas.

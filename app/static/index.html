@@ -379,7 +379,7 @@
       padding-bottom: 8px;
     }
 
-    /* Fricciones */
+    /* Fricciones y Semáforo */
     .friccion-item {
       background: #0d1117;
       border: 1px solid var(--card-border);
@@ -388,47 +388,218 @@
       padding: 14px;
       margin-bottom: 12px;
     }
-    .friccion-item.prio-1 { border-left-color: var(--danger); }
-    .friccion-item.prio-2 { border-left-color: var(--warning); }
-    .friccion-head {
+    .friccion-item.prio-1, .semaforo-card.critico {
+      border-left: 4px solid var(--danger);
+      background: #0d1117;
+      border-top: 1px solid #30363d;
+      border-right: 1px solid #30363d;
+      border-bottom: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .friccion-item.prio-2, .semaforo-card.moderado {
+      border-left: 4px solid var(--warning);
+      background: #0d1117;
+      border-top: 1px solid #30363d;
+      border-right: 1px solid #30363d;
+      border-bottom: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .semaforo-card.bajo {
+      border-left: 4px solid var(--success);
+      background: #0d1117;
+      border-top: 1px solid #30363d;
+      border-right: 1px solid #30363d;
+      border-bottom: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .badge-critico {
+      background: rgba(248, 81, 73, 0.2);
+      color: #f85149;
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+    .badge-moderado {
+      background: rgba(210, 153, 34, 0.2);
+      color: #d29922;
+      border: 1px solid rgba(210, 153, 34, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+    .badge-bajo {
+      background: rgba(46, 160, 67, 0.2);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .semaforo-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .friccion-title { font-weight: 600; color: var(--text-bright); font-size: 14px; }
-    .friccion-tickets { font-size: 12px; font-family: var(--font-mono); color: var(--accent); }
-    .friccion-diag { font-size: 13px; color: var(--text); margin-bottom: 8px; }
-    .friccion-action {
+    .semaforo-title {
+      font-weight: 600;
+      color: var(--text-bright);
+      font-size: 14.5px;
+    }
+    .semaforo-vol {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .semaforo-impact {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .evidence-box {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px dashed #21262d;
+    }
+    .evidence-tag {
+      background: #21262d;
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    /* Leaderboard */
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .leaderboard-table th {
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+    }
+    .leaderboard-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #21262d;
+    }
+    .leaderboard-table tr:hover { background: #1c2128; }
+    .pos-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: #21262d;
+      color: var(--text-muted);
+    }
+    .pos-1 { background: rgba(210, 153, 34, 0.25); color: #d29922; border: 1px solid #d29922; }
+    .pos-2 { background: rgba(139, 148, 158, 0.25); color: #c9d1d9; border: 1px solid #8b949e; }
+    .pos-3 { background: rgba(205, 127, 50, 0.25); color: #e3b341; border: 1px solid #cd7f32; }
+
+    /* Barra de Eficiencia Bot vs Humano */
+    .efficiency-container {
+      margin-top: 8px;
+    }
+    .efficiency-bar {
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      background: #21262d;
+      margin: 6px 0;
+    }
+    .eff-bot { background: #58a6ff; transition: width 0.3s; }
+    .eff-hum { background: #3fb950; transition: width 0.3s; }
+    .efficiency-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* Escalaciones y Workarounds */
+    .escalacion-card {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .escalacion-head {
+      font-weight: 600;
+      color: var(--warning);
+      font-size: 13.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .escalacion-mejora {
       font-size: 12.5px;
       color: #7ee787;
-      background: rgba(46, 160, 67, 0.1);
-      padding: 6px 10px;
-      border-radius: 4px;
+      background: rgba(46, 160, 67, 0.08);
       border-left: 3px solid var(--success);
-    }
-
-    /* Categorías */
-    .cat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #21262d;
-      font-size: 13px;
-    }
-    .cat-name { color: var(--text); }
-    .cat-count { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
-
-    /* Alertas */
-    .alert-tag {
-      background: rgba(248, 81, 73, 0.15);
-      border-left: 3px solid var(--danger);
-      color: #ff7b72;
       padding: 8px 12px;
       border-radius: 4px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .workaround-card {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .workaround-title {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 13.5px;
+      margin-bottom: 6px;
+    }
+    .workaround-desc {
       font-size: 13px;
-      margin-bottom: 8px;
+      color: var(--text);
+      line-height: 1.5;
     }
 
     /* Exportador */
@@ -633,88 +804,180 @@
     </div>
   </div>
 
-  <!-- Métricas Principales -->
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="label">Estado del Día</div>
-      <div class="value" id="val-estado">—</div>
-      <div class="subtext" id="sub-estado">Sin análisis activo</div>
+  <!-- 1. Métricas de Gestión Operativa -->
+  <div style="margin-bottom: 24px;">
+    <h2 style="font-size: 16px; font-weight: 600; color: var(--text-bright); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+      <span>1. Métricas de Gestión Operativa</span>
+      <span id="badge-periodo" style="font-size: 12px; font-weight: normal; color: var(--accent); font-family: var(--font-mono);"></span>
+    </h2>
+    <div class="metrics-grid">
+      <!-- Volumen Total -->
+      <div class="metric-card">
+        <div class="label">Volumen Total de Incidencias</div>
+        <div class="value" id="val-volumen-total">—</div>
+        <div class="subtext" id="sub-source">Tickets procesados en el período</div>
+      </div>
+
+      <!-- Categoría más recurrente -->
+      <div class="metric-card">
+        <div class="label">Categoría Más Recurrente</div>
+        <div class="value" id="val-cat-recurrente" style="font-size: 16px; line-height: 1.3;">—</div>
+        <div class="subtext" id="sub-cat-recurrente">Fricción predominante</div>
+      </div>
+
+      <!-- Canal Principal -->
+      <div class="metric-card">
+        <div class="label">Canal de Origen Principal</div>
+        <div class="value" id="val-canal-principal">—</div>
+        <div class="subtext" id="sub-canal-principal">Mayor afluencia de ingresos</div>
+      </div>
+
+      <!-- Eficiencia Bot vs Humano -->
+      <div class="metric-card">
+        <div class="label">Eficiencia del Bot vs. Humano</div>
+        <div class="value" id="val-eficiencia" style="font-size: 16px;">—</div>
+        <div class="efficiency-container">
+          <div class="efficiency-bar">
+            <div id="eff-bar-bot" class="eff-bot" style="width: 50%;"></div>
+            <div id="eff-bar-hum" class="eff-hum" style="width: 50%;"></div>
+          </div>
+          <div class="efficiency-labels">
+            <span id="lbl-eff-bot">🤖 Bot: —%</span>
+            <span id="lbl-eff-hum">👤 Humano: —%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tiempo Cierre -->
+      <div class="metric-card">
+        <div class="label">Tiempo de Cierre Promedio</div>
+        <div class="value" id="val-tiempo-cierre">—</div>
+        <div class="subtext">SLA medio de resolución</div>
+      </div>
     </div>
-    <div class="metric-card">
-      <div class="label">Tickets Procesados</div>
-      <div class="value" id="val-tickets">—</div>
-      <div class="subtext" id="sub-source">Origen: —</div>
-    </div>
-    <div class="metric-card">
-      <div class="label">Tokens & Inferencia</div>
-      <div class="value" id="val-tokens">—</div>
-      <div class="subtext" id="sub-tokens">Entrada / Salida</div>
-    </div>
-    <div class="metric-card">
-      <div class="label">Costo Económico</div>
-      <div class="value" id="val-costo">—</div>
-      <div class="subtext" id="sub-model">Modelo: Gemini Flash</div>
+
+    <!-- Tira de Inferencia y Costos de IA -->
+    <div style="background: #161b22; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12.5px; font-family: var(--font-mono); margin-top: 12px;">
+      <div>
+        <span style="color: var(--text-muted);">Modelo IA:</span> <strong id="val-modelo" style="color: var(--accent);">gemini-3.6-flash</strong>
+        <span style="color: var(--card-border); margin: 0 8px;">|</span>
+        <span style="color: var(--text-muted);">Tokens:</span> <span id="val-tokens">—</span>
+        <span style="color: var(--card-border); margin: 0 8px;">|</span>
+        <span style="color: var(--text-muted);">Costo:</span> <span id="val-costo" style="color: #7ee787;">—</span>
+        <span style="color: var(--card-border); margin: 0 8px;">|</span>
+        <span style="color: var(--text-muted);">Latencia:</span> <span id="val-latencia">—</span>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); margin-right: 6px;">Estado del Período:</span>
+        <span id="val-estado">—</span>
+      </div>
     </div>
   </div>
 
-  <!-- Contenedor Resultados -->
+  <!-- Fila: Resumen Ejecutivo y Leaderboard de Agentes -->
   <div class="results-section">
-    <!-- Columna Izquierda: Diagnóstico y Fricciones -->
+    <!-- Columna Izquierda: Resumen Ejecutivo y Distribución -->
     <div>
       <div class="card">
         <div class="card-title">Resumen Ejecutivo de Operaciones</div>
         <p id="txt-resumen" style="color: var(--text-bright); line-height: 1.6;">Seleccioná una fecha y hacé clic en "Consultar y Auditar Tickets" para iniciar la extracción desde HubSpot y el análisis agéntico.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Top 3 Cuellos de Botella y Acciones Priorizadas</div>
-        <div id="fricciones-list">
-          <p style="color: var(--text-muted); font-size: 13px;">No hay fricciones cargadas.</p>
+        
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--card-border);">
+          <div style="font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Distribución por Categoría</div>
+          <div id="categorias-list">
+            <p style="color: var(--text-muted); font-size: 13px;">Sin datos.</p>
+          </div>
         </div>
       </div>
-
-      <!-- Exportador oficial -->
-      <div class="export-box">
-        <div class="export-select">
-          <label style="color: #adbac7; font-size: 12px;">Guardar en carpeta del Trabajo Final como:</label>
-          <select id="select-corrida">
-            <option value="1">corridas/corrida_1.md</option>
-            <option value="2">corridas/corrida_2.md</option>
-            <option value="3">corridas/corrida_3.md</option>
-          </select>
-        </div>
-        <button class="btn-primary" onclick="exportCurrentCorrida()">💾 Exportar Corrida Oficial</button>
-      </div>
-      <div id="export-status" style="font-size: 12px; margin-top: 8px; color: var(--success);"></div>
     </div>
 
-    <!-- Columna Derecha: Categorías, Supervisión y Alertas -->
+    <!-- Columna Derecha: 2. Leaderboard de Agentes -->
     <div>
       <div class="card">
-        <div class="card-title">Distribución por Categoría</div>
-        <div id="categorias-list">
-          <p style="color: var(--text-muted); font-size: 13px;">Sin datos.</p>
+        <div class="card-title">2. Leaderboard de Agentes (Ordenado por mayor resolución)</div>
+        <div style="overflow-x: auto;">
+          <table class="leaderboard-table" id="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">Pos.</th>
+                <th>Agente</th>
+                <th style="text-align: right;">Tickets Cerrados</th>
+                <th style="text-align: right;">% Res.</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr><td colspan="4" style="color: var(--text-muted); text-align: center; padding: 14px;">Sin datos de resolución.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- 3. Diagnóstico de Producto e Incidencias Críticas (Priorizado por Semáforo) -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">
+      <span>3. Diagnóstico de Producto e Incidencias Críticas (Priorizado por Semáforo)</span>
+      <span style="font-size: 12px; color: var(--text-muted); font-weight: normal; font-family: var(--font-mono);">🔴 Crítico · 🟡 Moderado · 🟢 Bajo</span>
+    </div>
+    <div id="diagnostico-semaforo-list">
+      <p style="color: var(--text-muted); font-size: 13px;">No hay diagnósticos cargados.</p>
+    </div>
+  </div>
+
+  <!-- Fila: 4. Escalaciones del Bot y 5. Soluciones / Workarounds -->
+  <div class="results-section">
+    <!-- Columna Izquierda: 4. Análisis de Escalaciones del Bot -->
+    <div>
       <div class="card">
-        <div class="card-title">Alertas Inmediatas</div>
-        <div id="alertas-list">
-          <p style="color: var(--text-muted); font-size: 13px;">Sin alertas.</p>
+        <div class="card-title">4. Análisis de Escalaciones del Bot y Oportunidades de Mejora</div>
+        <div id="escalaciones-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin escalaciones analizadas.</p>
         </div>
       </div>
+    </div>
 
+    <!-- Columna Derecha: 5. Soluciones y Workarounds del Período -->
+    <div>
       <div class="card">
-        <div class="card-title">Supervisión Humana (L0–L4)</div>
-        <div style="font-size: 13px;">
-          <p><strong>Nivel:</strong> <span id="txt-sup-nivel" style="color: var(--accent);">—</span></p>
-          <p style="margin-top: 6px;"><strong>Firmante:</strong> <span id="txt-sup-resp">—</span></p>
-          <p style="margin-top: 6px;"><strong>Control:</strong> <span id="txt-sup-ctrl" style="color: var(--text-muted);">—</span></p>
+        <div class="card-title">5. Soluciones y Workarounds del Período</div>
+        <div id="workarounds-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin workarounds registrados.</p>
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- Fila: 6. Gobernanza Humana L0-L4, Exportador e Historial -->
+  <div class="results-section">
+    <div>
       <div class="card">
-        <div class="card-title">Historial de Consultas</div>
+        <div class="card-title">6. Gobernanza y Supervisión Humana (L0–L4)</div>
+        <div style="font-size: 13px; line-height: 1.6;">
+          <p><strong>Nivel de Supervisión Requerido:</strong> <span id="txt-sup-nivel" style="color: var(--accent); font-weight: 600;">—</span></p>
+          <p style="margin-top: 6px;"><strong>Responsable / Firmante:</strong> <span id="txt-sup-resp" style="color: var(--text-bright);">Walter Peron (Customer Support Lead)</span></p>
+          <p style="margin-top: 6px;"><strong>Puntos de Control:</strong> <span id="txt-sup-ctrl" style="color: var(--text-muted);">—</span></p>
+        </div>
+
+        <!-- Exportador oficial -->
+        <div class="export-box">
+          <div class="export-select">
+            <label style="color: #adbac7; font-size: 12px;">Guardar reporte oficial como:</label>
+            <select id="select-corrida">
+              <option value="1">corridas/corrida_1.md</option>
+              <option value="2">corridas/corrida_2.md</option>
+              <option value="3">corridas/corrida_3.md</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="exportCurrentCorrida()">💾 Exportar Corrida Oficial</button>
+        </div>
+        <div id="export-status" style="font-size: 12px; margin-top: 8px; color: var(--success);"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Historial de Consultas Realizadas</div>
         <table class="history-table" id="history-table">
           <thead>
             <tr>

@@ -33,6 +33,19 @@ El objetivo fue construir un sistema que permita a un equipo de Customer Success
   2. Se incorporó un ejemplo Few-Shot representativo en el prompt para guiar el tono y nivel de detalle requerido.
   3. A partir de esta modificación, el agente devolvió acciones concretas como: *"Reiniciar nodos del microservicio de firma y monitorear latencia de respuestas con infraestructura."*
 
+### Iteración 3 · Alineación con el Reporte Oficial Corporativo de Operaciones y Soporte (RCTA)
+* **Qué se probó:** Presentar los resultados en una lista plana de tickets categorizados con recomendaciones generales.
+* **Qué falló:** La estructura no reflejaba la metodología real con la que la gerencia y el equipo de operaciones analizan la performance del servicio (donde conviven un bot autónomo "René" y un equipo humano de agentes). Faltaban métricas de eficiencia comparativa, ranking de resolución (Leaderboard), categorización estricta por semáforo de criticidad (🔴/🟡/🟢) y diagnóstico de los motivos de fuga (escalaciones del bot) con sus respectivos workarounds documentados.
+* **Qué se cambió:**
+  1. Se rediseñó el contrato JSON (`prompts/system_prompt.md`) y el modelo de datos para estructurar el output en 5 pilares operativos oficiales:
+     - **Métricas de Gestión Operativa:** Total incidencias, categoría más recurrente, canal principal, split de eficiencia Bot René vs. Humanos y tiempo promedio de cierre.
+     - **Leaderboard de Agentes:** Ranking de tickets cerrados con medallas y desglose por tipo (bot vs humano).
+     - **Diagnóstico de Producto e Incidencias Críticas (Semáforo):** Agrupación por Rojo (Crítico), Amarillo (Moderado) y Verde (Bajo) con impacto y tags de IDs de HubSpot.
+     - **Análisis de Escalaciones del Bot y Oportunidades de Mejora:** Identificación de motivos de fuga de René Bot y soluciones automatizables en el flujo.
+     - **Soluciones y Workarounds del Período:** Procedimientos de contingencia documentados para destrabar la operación.
+  2. Se rediseñó completamente la interfaz en `dashboard_directo.html` y en `app/static/` para visualizar estas 5 secciones con diseño ejecutivo, tarjetas de semáforo con bordes distintivos, barra visual de distribución bot/humano y badges de evidencia.
+  3. Se alimentaron los datasets verificados con los datos reales del reporte semanal de RCTA (tickets `48264175697`, `48180653917`, etc.).
+
 ### Falla real reconocida con honestidad
 Durante las pruebas de integración con la API de búsqueda de HubSpot (`/crm/v3/objects/tickets/search`), se observó que cuando una fecha no contenía tickets o cuando la red corporativa bloqueaba las llamadas salientes hacia `api.hubapi.com`, la aplicación web quedaba colgada esperando el timeout del socket sin darle feedback al usuario. 
 Para resolverlo honestamente, se implementó un timeout estricto de 15 segundos en `requests`, un bloque `try/except` que captura errores de red y un mecanismo de fallback que ofrece datos verificados de prueba para que el sistema nunca colapse en silencio.
