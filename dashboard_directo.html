@@ -372,11 +372,74 @@
       <h1>Auditor Agéntico de Tickets Diarios</h1>
       <p>Conector HubSpot CRM API + Análisis de Triage con Gemini</p>
     </div>
-    <div class="header-badges">
+    <div class="header-badges" style="align-items: center; flex-wrap: wrap;">
+      <button class="btn-secondary" onclick="openConfigModal()" style="display: inline-flex; align-items: center; gap: 6px; border-color: var(--accent);">
+        ⚙️ Conexiones y APIs
+      </button>
       <div class="badge-mode">● Modo Autónomo Directo (file://)</div>
       <div class="badge-materia">MBA UCEMA · Trabajo Final</div>
     </div>
   </header>
+
+  <!-- Modal de Configuración de Credenciales y APIs (almacenamiento en localStorage) -->
+  <div id="modal-config" class="modal-overlay">
+    <div class="modal-box" style="max-width: 580px; border-color: var(--accent);">
+      <h3 style="color: var(--accent); border-bottom: 1px solid var(--card-border); padding-bottom: 10px;">
+        ⚙️ Configuración de Conexiones y Credenciales
+      </h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px; margin: 18px 0;">
+        <!-- Gemini -->
+        <div class="form-group">
+          <label for="cfg-gemini-key">Google Gemini API Key</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="password" id="cfg-gemini-key" placeholder="AIzaSy..." style="flex: 1;">
+            <button class="btn-secondary" type="button" onclick="testGeminiDirect()">Probar</button>
+          </div>
+          <span id="cfg-gemini-status" style="font-size: 11.5px; color: var(--text-muted);"></span>
+        </div>
+
+        <!-- Modelo Gemini -->
+        <div class="form-group">
+          <label for="cfg-gemini-model">Modelo de Inferencia</label>
+          <select id="cfg-gemini-model">
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Recomendado - Eficiencia económica)</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+          </select>
+        </div>
+
+        <!-- HubSpot -->
+        <div class="form-group">
+          <label for="cfg-hubspot-token">HubSpot Private App Token</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="password" id="cfg-hubspot-token" placeholder="pat-na1-..." style="flex: 1;">
+            <button class="btn-secondary" type="button" onclick="testHubspotDirect()">Probar</button>
+          </div>
+          <span id="cfg-hubspot-status" style="font-size: 11.5px; color: var(--text-muted);"></span>
+        </div>
+
+        <!-- n8n -->
+        <div class="form-group">
+          <label for="cfg-n8n-url">n8n Webhook URL (Opcional)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="cfg-n8n-url" placeholder="https://tu-n8n.com/webhook/tickets" style="flex: 1; background: #0d1117; border: 1px solid var(--card-border); color: var(--text-bright); padding: 9px 14px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px;">
+            <button class="btn-secondary" type="button" onclick="testN8nDirect()">Probar</button>
+          </div>
+          <span id="cfg-n8n-status" style="font-size: 11.5px; color: var(--text-muted);"></span>
+        </div>
+
+        <!-- Aviso de Seguridad -->
+        <div style="background: rgba(88, 166, 255, 0.08); border-left: 3px solid var(--accent); padding: 10px 12px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: var(--text);">
+          🔒 <strong>Seguridad garantizada:</strong> En este modo autónomo directo, las credenciales se almacenan exclusivamente en el <code>localStorage</code> de tu propio navegador. <strong>NUNCA</strong> se guardan en archivos del proyecto, ni se suben a GitHub, ni quedan en el repositorio público.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeConfigModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveSettingsDirect()">💾 Guardar en Navegador</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Panel de Control -->
   <div class="control-panel">
@@ -620,6 +683,7 @@ let currentActiveData = null;
 let currentActiveDate = "";
 
 document.addEventListener("DOMContentLoaded", () => {
+  loadSavedSettings();
   // Cargar por defecto las 3 corridas en el historial
   Object.keys(DATASETS).forEach(d => {
     evaluatedHistory[d] = {
@@ -635,6 +699,126 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cargar corrida 1 inicialmente
   loadHistoryItem("2026-09-08");
 });
+
+// --- Configuración y Credenciales en LocalStorage ---
+function openConfigModal() {
+  document.getElementById("modal-config").classList.add("active");
+  loadSavedSettings();
+}
+
+function closeConfigModal() {
+  document.getElementById("modal-config").classList.remove("active");
+}
+
+function loadSavedSettings() {
+  const gKey = localStorage.getItem("GEMINI_API_KEY") || "";
+  const hToken = localStorage.getItem("HUBSPOT_TOKEN") || "";
+  const n8nUrl = localStorage.getItem("N8N_URL") || "";
+  const model = localStorage.getItem("GEMINI_MODEL") || "gemini-2.5-flash";
+
+  if (gKey) {
+    document.getElementById("cfg-gemini-key").value = gKey;
+    document.getElementById("api-key-input").value = gKey;
+    document.getElementById("cfg-gemini-status").innerHTML = "<span style='color: var(--success);'>● Clave guardada en tu navegador</span>";
+  }
+  if (hToken) {
+    document.getElementById("cfg-hubspot-token").value = hToken;
+    document.getElementById("cfg-hubspot-status").innerHTML = "<span style='color: var(--success);'>● Token guardado en tu navegador</span>";
+  }
+  if (n8nUrl) {
+    document.getElementById("cfg-n8n-url").value = n8nUrl;
+    document.getElementById("cfg-n8n-status").innerHTML = "<span style='color: var(--success);'>● Webhook registrado</span>";
+  }
+  document.getElementById("cfg-gemini-model").value = model;
+}
+
+function saveSettingsDirect() {
+  const gKey = document.getElementById("cfg-gemini-key").value.trim();
+  const hToken = document.getElementById("cfg-hubspot-token").value.trim();
+  const n8nUrl = document.getElementById("cfg-n8n-url").value.trim();
+  const model = document.getElementById("cfg-gemini-model").value;
+
+  localStorage.setItem("GEMINI_API_KEY", gKey);
+  localStorage.setItem("HUBSPOT_TOKEN", hToken);
+  localStorage.setItem("N8N_URL", n8nUrl);
+  localStorage.setItem("GEMINI_MODEL", model);
+
+  if (gKey) document.getElementById("api-key-input").value = gKey;
+
+  alert("✅ ¡Credenciales guardadas en el navegador (localStorage) con éxito!\nNo se guardan en ningún archivo ni en Git.");
+  closeConfigModal();
+}
+
+async function testGeminiDirect() {
+  const key = document.getElementById("cfg-gemini-key").value.trim() || localStorage.getItem("GEMINI_API_KEY");
+  const model = document.getElementById("cfg-gemini-model").value;
+  const statusEl = document.getElementById("cfg-gemini-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando Gemini API...</span>";
+
+  if (!key) {
+    statusEl.innerHTML = "<span style='color: var(--danger);'>Ingresá una clave primero</span>";
+    return;
+  }
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: "Responde OK" }] }] })
+    });
+    if (res.ok) {
+      statusEl.innerHTML = `<span style='color: var(--success);'>✅ Conexión exitosa con ${model}!</span>`;
+    } else {
+      const err = await res.text();
+      statusEl.innerHTML = `<span style='color: var(--danger);'>❌ Error HTTP ${res.status}</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--danger);'>❌ ${err.message}</span>`;
+  }
+}
+
+async function testHubspotDirect() {
+  const token = document.getElementById("cfg-hubspot-token").value.trim() || localStorage.getItem("HUBSPOT_TOKEN");
+  const statusEl = document.getElementById("cfg-hubspot-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando HubSpot API...</span>";
+
+  if (!token) {
+    statusEl.innerHTML = "<span style='color: var(--danger);'>Ingresá un token primero</span>";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://api.hubapi.com/crm/v3/objects/tickets?limit=1", {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (res.ok) {
+      statusEl.innerHTML = `<span style='color: var(--success);'>✅ Conexión con HubSpot exitosa!</span>`;
+    } else {
+      statusEl.innerHTML = `<span style='color: var(--warning);'>⚠️ Nota: HubSpot bloquea llamadas directas desde file:/// por CORS. Para usar HubSpot en vivo usá iniciar_servidor.bat.</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--warning);'>⚠️ Bloqueo de CORS en file://. Para llamadas a HubSpot usá iniciar_servidor.bat.</span>`;
+  }
+}
+
+async function testN8nDirect() {
+  const url = document.getElementById("cfg-n8n-url").value.trim() || localStorage.getItem("N8N_URL");
+  const statusEl = document.getElementById("cfg-n8n-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando n8n webhook...</span>";
+
+  if (!url) {
+    statusEl.innerHTML = "<span style='color: var(--danger);'>Ingresá la URL del webhook</span>";
+    return;
+  }
+
+  try {
+    const res = await fetch(url + "?test=ping");
+    statusEl.innerHTML = `<span style='color: var(--success);'>✅ Webhook respondió (HTTP ${res.status})</span>`;
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--warning);'>⚠️ Verificá CORS en n8n si ejecutas desde file://, o usá iniciar_servidor.bat.</span>`;
+  }
+}
 
 function setQuickDate(d) {
   document.getElementById("date-input").value = d;

@@ -3,7 +3,148 @@ let currentActiveDate = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadHistory();
+  loadConfigStatus();
 });
+
+// --- Modal de Configuración y Credenciales ---
+function openConfigModal() {
+  document.getElementById("modal-config").classList.add("active");
+  loadConfigStatus();
+}
+
+function closeConfigModal() {
+  document.getElementById("modal-config").classList.remove("active");
+}
+
+async function loadConfigStatus() {
+  try {
+    const res = await fetch("/api/config");
+    if (!res.ok) return;
+    const cfg = await res.json();
+    
+    const gStatus = document.getElementById("cfg-gemini-status");
+    if (cfg.gemini_api_key_configured) {
+      gStatus.innerHTML = "<span style='color: var(--success);'>● API Key de Gemini configurada</span>";
+    } else {
+      gStatus.innerHTML = "<span style='color: var(--text-muted);'>○ Sin clave (se usa simulación local verificada)</span>";
+    }
+
+    const hStatus = document.getElementById("cfg-hubspot-status");
+    if (cfg.hubspot_token_configured) {
+      hStatus.innerHTML = "<span style='color: var(--success);'>● Token de HubSpot configurado</span>";
+    } else {
+      hStatus.innerHTML = "<span style='color: var(--text-muted);'>○ Sin token (se usa dataset oficial de prueba RCTA)</span>";
+    }
+
+    if (cfg.n8n_webhook_url) {
+      document.getElementById("cfg-n8n-url").value = cfg.n8n_webhook_url;
+      document.getElementById("cfg-n8n-status").innerHTML = "<span style='color: var(--success);'>● Webhook n8n registrado</span>";
+    }
+
+    if (cfg.gemini_model) {
+      document.getElementById("cfg-gemini-model").value = cfg.gemini_model;
+    }
+  } catch (err) {
+    console.warn("No se pudo cargar config del servidor:", err);
+  }
+}
+
+async function saveConfiguration() {
+  const gKey = document.getElementById("cfg-gemini-key").value.trim();
+  const hToken = document.getElementById("cfg-hubspot-token").value.trim();
+  const n8nUrl = document.getElementById("cfg-n8n-url").value.trim();
+  const model = document.getElementById("cfg-gemini-model").value;
+
+  try {
+    const res = await fetch("/api/config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gemini_api_key: gKey,
+        hubspot_token: hToken,
+        n8n_url: n8nUrl,
+        gemini_model: model
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("✅ ¡Configuración guardada en tu .env local con éxito!");
+      closeConfigModal();
+      loadConfigStatus();
+    } else {
+      alert("Error: " + data.error);
+    }
+  } catch (err) {
+    alert("Error al guardar: " + err.message);
+  }
+}
+
+async function testGeminiConnection() {
+  const key = document.getElementById("cfg-gemini-key").value.trim();
+  const model = document.getElementById("cfg-gemini-model").value;
+  const statusEl = document.getElementById("cfg-gemini-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando conexión...</span>";
+
+  try {
+    const res = await fetch("/api/test_gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ api_key: key, model: model })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      statusEl.innerHTML = `<span style='color: var(--success);'>✅ ${data.message}</span>`;
+    } else {
+      statusEl.innerHTML = `<span style='color: var(--danger);'>❌ Error: ${data.error}</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--danger);'>❌ ${err.message}</span>`;
+  }
+}
+
+async function testHubspotConnection() {
+  const token = document.getElementById("cfg-hubspot-token").value.trim();
+  const statusEl = document.getElementById("cfg-hubspot-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando conexión...</span>";
+
+  try {
+    const res = await fetch("/api/test_hubspot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: token })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      statusEl.innerHTML = `<span style='color: var(--success);'>✅ ${data.message}</span>`;
+    } else {
+      statusEl.innerHTML = `<span style='color: var(--danger);'>❌ Error: ${data.error}</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--danger);'>❌ ${err.message}</span>`;
+  }
+}
+
+async function testN8nConnection() {
+  const url = document.getElementById("cfg-n8n-url").value.trim();
+  const statusEl = document.getElementById("cfg-n8n-status");
+  statusEl.innerHTML = "<span style='color: var(--accent);'>Probando webhook n8n...</span>";
+
+  try {
+    const res = await fetch("/api/test_n8n", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      statusEl.innerHTML = `<span style='color: var(--success);'>✅ ${data.message}</span>`;
+    } else {
+      statusEl.innerHTML = `<span style='color: var(--danger);'>❌ Error: ${data.error}</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span style='color: var(--danger);'>❌ ${err.message}</span>`;
+  }
+}
 
 function setQuickDate(d) {
   document.getElementById("date-input").value = d;

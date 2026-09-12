@@ -228,6 +228,134 @@ Total de tickets recibidos: **{len(tickets)}**
     })
 
 
+@app.route("/api/config", methods=["GET", "POST"])
+def manage_config():
+    env_path = os.path.join(BASE_DIR, ".env")
+    if request.method == "GET":
+        # Devolver estado sin exponer claves completas
+        g_key = os.getenv("GEMINI_API_KEY", "")
+        h_token = os.getenv("HUBSPOT_ACCESS_TOKEN", "")
+        n8n_url = os.getenv("N8N_WEBHOOK_URL", "")
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        return jsonify({
+            "gemini_api_key_configured": bool(g_key and g_key != "tu_api_key_gemini_aqui"),
+            "hubspot_token_configured": bool(h_token and h_token != "tu_token_privado_hubspot_aqui"),
+            "n8n_webhook_url": n8n_url if n8n_url != "http://localhost:5678/webhook/tickets" else "",
+            "gemini_model": model
+        })
+
+    # Guardar en .env local
+    data = request.get_json() or {}
+    g_key = data.get("gemini_api_key", "").strip()
+    h_token = data.get("hubspot_token", "").strip()
+    n8n_url = data.get("n8n_url", "").strip()
+    model = data.get("gemini_model", "gemini-2.5-flash").strip()
+
+    # Actualizar os.environ en memoria
+    if g_key:
+        os.environ["GEMINI_API_KEY"] = g_key
+    if h_token:
+        os.environ["HUBSPOT_ACCESS_TOKEN"] = h_token
+    if n8n_url:
+        os.environ["N8N_WEBHOOK_URL"] = n8n_url
+    if model:
+        os.environ["GEMINI_MODEL"] = model
+
+    # Escribir en .env (ignorado por git)
+    env_content = f"""# Variables de Entorno Locales (NUNCA subir a GitHub)
+GEMINI_API_KEY={os.environ.get('GEMINI_API_KEY', '')}
+HUBSPOT_ACCESS_TOKEN={os.environ.get('HUBSPOT_ACCESS_TOKEN', '')}
+N8N_WEBHOOK_URL={os.environ.get('N8N_WEBHOOK_URL', '')}
+GEMINI_MODEL={os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')}
+PORT={os.environ.get('PORT', 8000)}
+"""
+    with open(env_path, "w", encoding="utf-8") as f:
+        f.write(env_content)
+
+    return jsonify({"success": True, "message": "Configuración guardada localmente en .env con éxito."})
+
+
+@app.route("/api/test_gemini", methods=["POST"])
+def test_gemini():
+    import requests, time
+    data = request.get_json() or {}
+    key = data.get("api_key", "").strip() or os.getenv("GEMINI_API_KEY", "")
+    model = data.get("model", "gemini-2.5-flash").strip()
+
+    if not key or key == "tu_api_key_gemini_aqui":
+        return jsonify({"success": False, "error": "No se ingresó ninguna clave de Gemini"}), 400
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{"parts": [{"text": "Responde únicamente 'OK'"}]}]
+    }
+
+    t0 = time.time()
+    try:
+        r = requests.post(url, headers=headers, json=payload, timeout=10)
+        ms = int((time.time() - t0) * 1000)
+        if r.status_code == 200:
+            return jsonify({"success": True, "message": f"Conexión exitosa con {model} ({ms} ms)", "latency_ms": ms})
+        else:
+            return jsonify({"success": False, "error": f"Error {r.status_code}: {r.text}"}), r.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/test_hubspot", methods=["POST"])
+def test_hubspot():
+    import requests, time
+    data = request.get_json() or {}
+    token = data.get("token", "").strip() or os.getenv("HUBSPOT_ACCESS_TOKEN", "")
+
+    if not token or token == "tu_token_privado_hubspot_aqui":
+        return jsonify({"success": False, "error": "No se ingresó token de HubSpot"}), 400
+
+    url = "https://api.hubapi.com/crm/v3/objects/tickets?limit=1"
+    headers = {"Authorization": f"Bearer {token}"}
+
+    t0 = time.time()
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        ms = int((time.time() - t0) * 1000)
+        if r.status_code == 200:
+            res_data = r.json()
+            return jsonify({
+                "success": True,
+                "message": f"Conexión exitosa con HubSpot API ({ms} ms)",
+                "total_tickets": res_data.get("total", 1),
+                "latency_ms": ms
+            })
+        else:
+            return jsonify({"success": False, "error": f"Error HubSpot {r.status_code}: {r.text}"}), r.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/test_n8n", methods=["POST"])
+def test_n8n():
+    import requests, time
+    data = request.get_json() or {}
+    webhook_url = data.get("url", "").strip() or os.getenv("N8N_WEBHOOK_URL", "")
+
+    if not webhook_url:
+        return jsonify({"success": False, "error": "No se ingresó URL de webhook de n8n"}), 400
+
+    t0 = time.time()
+    try:
+        # Ping de prueba
+        r = requests.get(webhook_url, params={"date": "2026-09-08", "test": "ping"}, timeout=10)
+        ms = int((time.time() - t0) * 1000)
+        return jsonify({
+            "success": True,
+            "status_code": r.status_code,
+            "message": f"Webhook n8n respondió con código HTTP {r.status_code} ({ms} ms)"
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Error conectando a n8n: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     print(f"Iniciando servidor web en http://localhost:{port}")
