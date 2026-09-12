@@ -1,0 +1,306 @@
+{
+  "2026-09-08": {
+    "date": "2026-09-08",
+    "timestamp": "2026-09-08T18:30:00-03:00",
+    "source": "HubSpot Dataset Local (Prueba Verificada RCTA)",
+    "total_tickets": 5,
+    "tickets": [
+      {
+        "id": "TK-20811",
+        "subject": "Firma digital trabada en paso 3",
+        "content": "Estimados, estoy en el consultorio intentando emitir recetas para pacientes crónicos. Al poner la clave de firma digital el sistema queda con la rueda girando y no emite.",
+        "priority": "HIGH",
+        "stage": "open",
+        "createdate": "2026-09-08T09:15:22Z"
+      },
+      {
+        "id": "TK-20812",
+        "subject": "Error 504 al generar receta triple",
+        "content": "Quise emitir tres recetas seguidas y en la última me arrojó 'Error 504 Gateway Timeout'. No sé si la receta se grabó o el paciente se quedó sin medicación.",
+        "priority": "HIGH",
+        "stage": "open",
+        "createdate": "2026-09-08T10:30:11Z"
+      },
+      {
+        "id": "TK-20815",
+        "subject": "Consulta sobre cambio de plan prepaga",
+        "content": "Hola, quería saber si el plan actual cubre la validación automática con Osde y Swiss Medical.",
+        "priority": "LOW",
+        "stage": "in_progress",
+        "createdate": "2026-09-08T11:45:00Z"
+      },
+      {
+        "id": "TK-20819",
+        "subject": "Firma de receta no impacta en farmacia",
+        "content": "Un paciente me avisa desde Farmacity que el código de barra de la receta digital emitida hoy figura como 'no autorizada por entidad médica'.",
+        "priority": "HIGH",
+        "stage": "open",
+        "createdate": "2026-09-08T14:20:45Z"
+      },
+      {
+        "id": "TK-20822",
+        "subject": "Actualización de CUIT en factura A",
+        "content": "Necesito cambiar la razón social a la que me emiten la factura mensual del servicio.",
+        "priority": "LOW",
+        "stage": "closed",
+        "createdate": "2026-09-08T16:05:10Z"
+      }
+    ],
+    "audit_result": {
+      "success": true,
+      "data": {
+        "fecha_analisis": "2026-09-08",
+        "total_tickets": 5,
+        "estado_operativo": "Alerta",
+        "resumen_ejecutivo": "Jornada crítica en el subsistema de firma digital y dispensación farmacéutica. Se concentran 3 incidentes de alta prioridad (60% del volumen) que provocan bloqueos directos en la emisión de recetas médicas y rechazos en ventanilla de farmacia.",
+        "distribucion_categorias": {
+          "Emision_Firma_Recetas": 3,
+          "Farmacia_Dispensa": 1,
+          "Facturacion_Cuenta": 1
+        },
+        "top_fricciones": [
+          {
+            "prioridad": 1,
+            "categoria": "Emisión / Firma de Recetas",
+            "tickets_afectados": [
+              "TK-20811",
+              "TK-20812"
+            ],
+            "diagnostico": "Latencia crítica y timeout 504 en el microservicio de firma digital en paso 3.",
+            "accion_sugerida": "Reiniciar nodos del microservicio de firma y monitorear latencia de respuestas con infraestructura."
+          },
+          {
+            "prioridad": 2,
+            "categoria": "Farmacia / Dispensa",
+            "tickets_afectados": [
+              "TK-20819"
+            ],
+            "diagnostico": "Receta no autorizada en Farmacity por desincronización de token con el validador farmacéutico.",
+            "accion_sugerida": "Verificar sincronización del servicio de webhooks con la red de farmacias Farmacity."
+          },
+          {
+            "prioridad": 3,
+            "categoria": "Facturación / Cuenta",
+            "tickets_afectados": [
+              "TK-20822"
+            ],
+            "diagnostico": "Solicitud administrativa de cambio de CUIT para facturación tipo A.",
+            "accion_sugerida": "Derivar a administración para actualización de datos impositivos en el panel de facturación."
+          }
+        ],
+        "alertas_inmediatas": [
+          "Alerta de alta severidad: Tickets TK-20811 y TK-20812 señalan caída parcial en la emisión de recetas crónicas."
+        ],
+        "supervision_humana": {
+          "nivel_l_requerido": "L2 (Revisión humana previa antes de accionar)",
+          "responsable": "Customer Support Lead",
+          "puntos_de_control": "Confirmar estado del servidor de firma digital con el equipo de DevOps antes de notificar a los médicos."
+        }
+      },
+      "raw_text": "{\n  \"fecha_analisis\": \"2026-09-08\",\n  \"total_tickets\": 5,\n  \"estado_operativo\": \"Alerta\",\n  \"resumen_ejecutivo\": \"Para el día 2026-09-08 se procesaron 5 tickets. Se observa concentración de casos de soporte en emisión y validación de usuarios con necesidad de atención operativa.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 3,\n    \"Friccion_Onboarding\": 0,\n    \"Consulta_General\": 1\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Operaciones / Triage\",\n      \"tickets_afectados\": [\n        \"TK-20811\",\n        \"TK-20812\"\n      ],\n      \"diagnostico\": \"Tickets con prioridad alta que requieren resolución antes de comprometer el servicio al paciente.\",\n      \"accion_sugerida\": \"Contactar a los médicos afectados y reasignar a guardia técnica inmediata.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket TK-20811 requiere seguimiento prioritario por severidad declarada.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Auditar si la causa raíz reportada en los tickets críticos afecta a más usuarios concurrentes.\"\n  }\n}",
+      "model": "gemini-2.5-flash (Simulado - Modo Local)",
+      "metrics": {
+        "input_tokens": 2210,
+        "output_tokens": 530,
+        "total_tokens": 2740,
+        "estimated_cost_usd": 0.000325,
+        "latency_ms": 1350
+      },
+      "system_prompt_used": "# System Prompt: Agente de Triage y Auditoría Diaria de Tickets (HubSpot CRM)\n\n## 1. Rol e Identidad\nSos un Agente Senior de Inteligencia Operativa, Triage y Auditoría de Customer Support para la plataforma de recetas médicas y servicios de salud RCTA. Tu función es auditar los tickets de soporte ingresados durante el día, diagnosticar la salud operativa de la plataforma y orientar al equipo de Customer Success y Producto hacia las soluciones más urgentes.\n\n## 2. Objetivo y Tarea\nAnalizar el lote diario de tickets extraídos de HubSpot CRM para una fecha específica. Debes:\n1. Clasificar cada ticket en una de las categorías operativas estándar: `Falla Técnica / Bug`, `Fricción Onboarding / Validación Matrícula`, `Emisión / Firma de Recetas`, `Farmacia / Dispensa`, `Facturación / Cuenta`, o `Consulta General`.\n2. Identificar el estado general del día (`Saludable`, `Alerta` o `Crítico`) según la severidad y concentración de incidencias.\n3. Sintetizar un resumen ejecutivo de 3 a 5 líneas con las observaciones clave.\n4. Calcular la distribución cuantitativa de tickets por categoría.\n5. Extraer el Top 3 de fricciones o cuellos de botella del día, indicando tickets afectados y una acción correctiva hiper-específica.\n6. Detectar cualquier alerta inmediata de riesgo (clientes frustrados de alto valor, caída de servicio o bloqueo masivo).\n7. Definir el nivel de supervisión humana requerido (L0 a L4) y el responsable asignado.\n\n## 3. Contexto\nRecibís un arreglo JSON con los tickets extraídos directamente de HubSpot CRM mediante la API de Tickets para una fecha dada. Cada ticket incluye: `id`, `subject`, `content` (descripción del problema reportado), `priority` (`HIGH`, `MEDIUM`, `LOW`) y `stage`.\n\n## 4. Restricciones\n* **Grounding Estricto y Verificable:** Basate exclusivamente en los datos presentes en el JSON de entrada. Prohibido inventar tickets, asumir causas no documentadas o citar IDs que no existan en el lote.\n* **Privacidad y Datos Sensibles:** No divulgues información confidencial de pacientes (nombres, patologías). Refiérete únicamente al ID de ticket y al síntoma funcional reportado por el médico o usuario.\n* **Concisión en Acciones:** Cada `accion_sugerida` debe ser hiper-específica, de máximo 20 palabras y redactada en modo imperativo.\n* **Salida Estructurada Pura:** Tu respuesta debe ser ÚNICAMENTE un bloque de código JSON válido, sin saludos, sin preámbulos tipo \"Aquí está el análisis\", y sin comentarios explicativos fuera del JSON.\n\n## 5. Ejemplo Few-Shot\n**Entrada de muestra:**\n```json\n[\n  {\n    \"id\": \"10492\",\n    \"subject\": \"Error al firmar con certificado digital\",\n    \"content\": \"Intento firmar la receta 4812 y la app se queda cargando indefinidamente en paso 3.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\"\n  },\n  {\n    \"id\": \"10495\",\n    \"subject\": \"Validación de matrícula pendiente\",\n    \"content\": \"Cargué mis papeles hace 4 días y todavía dice en revisión.\",\n    \"priority\": \"MEDIUM\",\n    \"stage\": \"in_progress\"\n  }\n]\n```\n\n**Salida esperada:**\n```json\n{\n  \"fecha_analisis\": \"2026-09-12\",\n  \"total_tickets\": 2,\n  \"estado_operativo\": \"Alerta\",\n  \"resumen_ejecutivo\": \"Se detectó incidencia bloqueante de firma digital y retrasos en validación documental. La falla de firma impacta directamente en la prescripción médica.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 1,\n    \"Friccion_Onboarding\": 1\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Emisión / Firma de Recetas\",\n      \"tickets_afectados\": [\"10492\"],\n      \"diagnostico\": \"Timeout recurrente en paso 3 de validación de firma digital.\",\n      \"accion_sugerida\": \"Escalar a ingeniería para revisar latencia del microservicio de firma digital.\"\n    },\n    {\n      \"prioridad\": 2,\n      \"categoria\": \"Fricción Onboarding\",\n      \"tickets_afectados\": [\"10495\"],\n      \"diagnostico\": \"Demoras en validación manual de matrículas médicas superando SLA de 48hs.\",\n      \"accion_sugerida\": \"Asignar validador de guardia para liquidar cola de aprobaciones demoradas.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket 10492 reporta bloqueo total de emisión por falla de firma.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Validar si el error de firma es aislado o sistémico antes de emitir comunicado.\"\n  }\n}\n```\n\n## 6. Formato de Salida Obligatorio\nTu única salida debe ser un objeto JSON parseable con esta estructura:\n```json\n{\n  \"fecha_analisis\": \"AAAA-MM-DD\",\n  \"total_tickets\": 0,\n  \"estado_operativo\": \"Saludable | Alerta | Crítico\",\n  \"resumen_ejecutivo\": \"Texto descriptivo de 3 a 5 líneas.\",\n  \"distribucion_categorias\": {\n    \"categoria_1\": 0,\n    \"categoria_2\": 0\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Nombre de categoría\",\n      \"tickets_afectados\": [\"ID1\", \"ID2\"],\n      \"diagnostico\": \"Diagnóstico claro del síntoma\",\n      \"accion_sugerida\": \"Acción específica de máximo 20 palabras\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Detalle de alerta 1\",\n    \"Detalle de alerta 2\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L0 | L1 | L2 | L3 | L4\",\n    \"responsable\": \"Rol del firmante humano\",\n    \"puntos_de_control\": \"Aspectos críticos a auditar antes de cerrar el día\"\n  }\n}\n```\n",
+      "user_prompt_used": "# User Prompt: Inyección de Lote Diario de Tickets\n\n## Tarea\nProcesá el lote de tickets de soporte extraído de HubSpot CRM para la fecha solicitada. Aplicá las directivas de clasificación, diagnóstico de cuellos de botella y recomendaciones operativas estipuladas en el System Prompt. Devolvé únicamente el JSON estructurado solicitado.\n\n## Parámetros de la Corrida\n* **Fecha de consulta:** 2026-09-08\n* **Total de tickets en el lote:** 5\n* **Origen de datos:** HubSpot CRM API (`POST /crm/v3/objects/tickets/search`)\n\n## Lote de Tickets Recibidos (JSON crudo de HubSpot):\n```json\n[\n  {\n    \"id\": \"TK-20811\",\n    \"subject\": \"Firma digital trabada en paso 3\",\n    \"content\": \"Estimados, estoy en el consultorio intentando emitir recetas para pacientes crónicos. Al poner la clave de firma digital el sistema queda con la rueda girando y no emite.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-08T09:15:22Z\"\n  },\n  {\n    \"id\": \"TK-20812\",\n    \"subject\": \"Error 504 al generar receta triple\",\n    \"content\": \"Quise emitir tres recetas seguidas y en la última me arrojó 'Error 504 Gateway Timeout'. No sé si la receta se grabó o el paciente se quedó sin medicación.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-08T10:30:11Z\"\n  },\n  {\n    \"id\": \"TK-20815\",\n    \"subject\": \"Consulta sobre cambio de plan prepaga\",\n    \"content\": \"Hola, quería saber si el plan actual cubre la validación automática con Osde y Swiss Medical.\",\n    \"priority\": \"LOW\",\n    \"stage\": \"in_progress\",\n    \"createdate\": \"2026-09-08T11:45:00Z\"\n  },\n  {\n    \"id\": \"TK-20819\",\n    \"subject\": \"Firma de receta no impacta en farmacia\",\n    \"content\": \"Un paciente me avisa desde Farmacity que el código de barra de la receta digital emitida hoy figura como 'no autorizada por entidad médica'.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-08T14:20:45Z\"\n  },\n  {\n    \"id\": \"TK-20822\",\n    \"subject\": \"Actualización de CUIT en factura A\",\n    \"content\": \"Necesito cambiar la razón social a la que me emiten la factura mensual del servicio.\",\n    \"priority\": \"LOW\",\n    \"stage\": \"closed\",\n    \"createdate\": \"2026-09-08T16:05:10Z\"\n  }\n]\n```\n"
+    }
+  },
+  "2026-09-09": {
+    "date": "2026-09-09",
+    "timestamp": "2026-09-09T18:30:00-03:00",
+    "source": "HubSpot Dataset Local (Prueba Verificada RCTA)",
+    "total_tickets": 4,
+    "tickets": [
+      {
+        "id": "TK-20901",
+        "subject": "Demora en validación de matrícula provincial",
+        "content": "Cargué mis fotos de matrícula de PBA hace 72 horas y sigo en estado 'En revisión'. Tengo pacientes esperando prescripción hoy mismo.",
+        "priority": "HIGH",
+        "stage": "open",
+        "createdate": "2026-09-09T08:45:10Z"
+      },
+      {
+        "id": "TK-20904",
+        "subject": "No puedo subir foto del DNI",
+        "content": "La app me rechaza la foto del reverso del DNI diciendo 'formato no soportado', pero es un JPG estándar sacado con el celular.",
+        "priority": "MEDIUM",
+        "stage": "open",
+        "createdate": "2026-09-09T10:12:33Z"
+      },
+      {
+        "id": "TK-20908",
+        "subject": "Médico nuevo no puede configurar membrete",
+        "content": "Intento subir el logo del sanatorio para que salga en el encabezado de la receta y queda cortado.",
+        "priority": "LOW",
+        "stage": "in_progress",
+        "createdate": "2026-09-09T12:00:54Z"
+      },
+      {
+        "id": "TK-20912",
+        "subject": "Validación matrícula bloqueada",
+        "content": "Mi matrícula nacional vence en 2028 pero el validador automático me dice 'Matrícula no encontrada en SISA'.",
+        "priority": "HIGH",
+        "stage": "open",
+        "createdate": "2026-09-09T15:22:18Z"
+      }
+    ],
+    "audit_result": {
+      "success": true,
+      "data": {
+        "fecha_analisis": "2026-09-09",
+        "total_tickets": 4,
+        "estado_operativo": "Alerta",
+        "resumen_ejecutivo": "El 75% de los tickets ingresados corresponden a fricciones en el embudo de onboarding de nuevos profesionales. Se detectan cuellos de botella en la validación contra SISA y rechazos de formato en la carga de documentación.",
+        "distribucion_categorias": {
+          "Friccion_Onboarding": 3,
+          "Soporte_Tecnico_UI": 1
+        },
+        "top_fricciones": [
+          {
+            "prioridad": 1,
+            "categoria": "Fricción Onboarding / Validación Matrícula",
+            "tickets_afectados": [
+              "TK-20901",
+              "TK-20912"
+            ],
+            "diagnostico": "Demora que supera el SLA de 48hs y fallo de sincronización con padrón SISA nacional.",
+            "accion_sugerida": "Realizar validación manual de matrículas PBA en el registro del colegio médico."
+          },
+          {
+            "prioridad": 2,
+            "categoria": "Fricción Onboarding / Documentación",
+            "tickets_afectados": [
+              "TK-20904"
+            ],
+            "diagnostico": "Parser de imágenes rechaza archivos JPG estándar tomados con cámaras de smartphones modernos.",
+            "accion_sugerida": "Ajustar validación de mime-type en formulario de carga para aceptar formatos JPG y HEIC."
+          },
+          {
+            "prioridad": 3,
+            "categoria": "Soporte Técnico UI",
+            "tickets_afectados": [
+              "TK-20908"
+            ],
+            "diagnostico": "Problema de maquetado en recorte de membrete para recetas institucionales.",
+            "accion_sugerida": "Enviar guía de dimensiones recomendadas y reportar bug de recorte a diseño UI."
+          }
+        ],
+        "alertas_inmediatas": [
+          "Médicos con pacientes agendados frenados en etapa de onboarding (TK-20901, TK-20912)."
+        ],
+        "supervision_humana": {
+          "nivel_l_requerido": "L2 (Revisión humana previa antes de accionar)",
+          "responsable": "Customer Support Lead",
+          "puntos_de_control": "Revisar antecedentes de matrículas en el portal provincial antes de otorgar aprobación excepcional."
+        }
+      },
+      "raw_text": "{\n  \"fecha_analisis\": \"2026-09-09\",\n  \"total_tickets\": 4,\n  \"estado_operativo\": \"Alerta\",\n  \"resumen_ejecutivo\": \"Para el día 2026-09-09 se procesaron 4 tickets. Se observa concentración de casos de soporte en emisión y validación de usuarios con necesidad de atención operativa.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 0,\n    \"Friccion_Onboarding\": 3,\n    \"Consulta_General\": 0\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Operaciones / Triage\",\n      \"tickets_afectados\": [\n        \"TK-20901\",\n        \"TK-20904\"\n      ],\n      \"diagnostico\": \"Tickets con prioridad alta que requieren resolución antes de comprometer el servicio al paciente.\",\n      \"accion_sugerida\": \"Contactar a los médicos afectados y reasignar a guardia técnica inmediata.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket TK-20901 requiere seguimiento prioritario por severidad declarada.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Auditar si la causa raíz reportada en los tickets críticos afecta a más usuarios concurrentes.\"\n  }\n}",
+      "model": "gemini-2.5-flash (Simulado - Modo Local)",
+      "metrics": {
+        "input_tokens": 2102,
+        "output_tokens": 511,
+        "total_tokens": 2613,
+        "estimated_cost_usd": 0.000311,
+        "latency_ms": 1100
+      },
+      "system_prompt_used": "# System Prompt: Agente de Triage y Auditoría Diaria de Tickets (HubSpot CRM)\n\n## 1. Rol e Identidad\nSos un Agente Senior de Inteligencia Operativa, Triage y Auditoría de Customer Support para la plataforma de recetas médicas y servicios de salud RCTA. Tu función es auditar los tickets de soporte ingresados durante el día, diagnosticar la salud operativa de la plataforma y orientar al equipo de Customer Success y Producto hacia las soluciones más urgentes.\n\n## 2. Objetivo y Tarea\nAnalizar el lote diario de tickets extraídos de HubSpot CRM para una fecha específica. Debes:\n1. Clasificar cada ticket en una de las categorías operativas estándar: `Falla Técnica / Bug`, `Fricción Onboarding / Validación Matrícula`, `Emisión / Firma de Recetas`, `Farmacia / Dispensa`, `Facturación / Cuenta`, o `Consulta General`.\n2. Identificar el estado general del día (`Saludable`, `Alerta` o `Crítico`) según la severidad y concentración de incidencias.\n3. Sintetizar un resumen ejecutivo de 3 a 5 líneas con las observaciones clave.\n4. Calcular la distribución cuantitativa de tickets por categoría.\n5. Extraer el Top 3 de fricciones o cuellos de botella del día, indicando tickets afectados y una acción correctiva hiper-específica.\n6. Detectar cualquier alerta inmediata de riesgo (clientes frustrados de alto valor, caída de servicio o bloqueo masivo).\n7. Definir el nivel de supervisión humana requerido (L0 a L4) y el responsable asignado.\n\n## 3. Contexto\nRecibís un arreglo JSON con los tickets extraídos directamente de HubSpot CRM mediante la API de Tickets para una fecha dada. Cada ticket incluye: `id`, `subject`, `content` (descripción del problema reportado), `priority` (`HIGH`, `MEDIUM`, `LOW`) y `stage`.\n\n## 4. Restricciones\n* **Grounding Estricto y Verificable:** Basate exclusivamente en los datos presentes en el JSON de entrada. Prohibido inventar tickets, asumir causas no documentadas o citar IDs que no existan en el lote.\n* **Privacidad y Datos Sensibles:** No divulgues información confidencial de pacientes (nombres, patologías). Refiérete únicamente al ID de ticket y al síntoma funcional reportado por el médico o usuario.\n* **Concisión en Acciones:** Cada `accion_sugerida` debe ser hiper-específica, de máximo 20 palabras y redactada en modo imperativo.\n* **Salida Estructurada Pura:** Tu respuesta debe ser ÚNICAMENTE un bloque de código JSON válido, sin saludos, sin preámbulos tipo \"Aquí está el análisis\", y sin comentarios explicativos fuera del JSON.\n\n## 5. Ejemplo Few-Shot\n**Entrada de muestra:**\n```json\n[\n  {\n    \"id\": \"10492\",\n    \"subject\": \"Error al firmar con certificado digital\",\n    \"content\": \"Intento firmar la receta 4812 y la app se queda cargando indefinidamente en paso 3.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\"\n  },\n  {\n    \"id\": \"10495\",\n    \"subject\": \"Validación de matrícula pendiente\",\n    \"content\": \"Cargué mis papeles hace 4 días y todavía dice en revisión.\",\n    \"priority\": \"MEDIUM\",\n    \"stage\": \"in_progress\"\n  }\n]\n```\n\n**Salida esperada:**\n```json\n{\n  \"fecha_analisis\": \"2026-09-12\",\n  \"total_tickets\": 2,\n  \"estado_operativo\": \"Alerta\",\n  \"resumen_ejecutivo\": \"Se detectó incidencia bloqueante de firma digital y retrasos en validación documental. La falla de firma impacta directamente en la prescripción médica.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 1,\n    \"Friccion_Onboarding\": 1\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Emisión / Firma de Recetas\",\n      \"tickets_afectados\": [\"10492\"],\n      \"diagnostico\": \"Timeout recurrente en paso 3 de validación de firma digital.\",\n      \"accion_sugerida\": \"Escalar a ingeniería para revisar latencia del microservicio de firma digital.\"\n    },\n    {\n      \"prioridad\": 2,\n      \"categoria\": \"Fricción Onboarding\",\n      \"tickets_afectados\": [\"10495\"],\n      \"diagnostico\": \"Demoras en validación manual de matrículas médicas superando SLA de 48hs.\",\n      \"accion_sugerida\": \"Asignar validador de guardia para liquidar cola de aprobaciones demoradas.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket 10492 reporta bloqueo total de emisión por falla de firma.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Validar si el error de firma es aislado o sistémico antes de emitir comunicado.\"\n  }\n}\n```\n\n## 6. Formato de Salida Obligatorio\nTu única salida debe ser un objeto JSON parseable con esta estructura:\n```json\n{\n  \"fecha_analisis\": \"AAAA-MM-DD\",\n  \"total_tickets\": 0,\n  \"estado_operativo\": \"Saludable | Alerta | Crítico\",\n  \"resumen_ejecutivo\": \"Texto descriptivo de 3 a 5 líneas.\",\n  \"distribucion_categorias\": {\n    \"categoria_1\": 0,\n    \"categoria_2\": 0\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Nombre de categoría\",\n      \"tickets_afectados\": [\"ID1\", \"ID2\"],\n      \"diagnostico\": \"Diagnóstico claro del síntoma\",\n      \"accion_sugerida\": \"Acción específica de máximo 20 palabras\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Detalle de alerta 1\",\n    \"Detalle de alerta 2\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L0 | L1 | L2 | L3 | L4\",\n    \"responsable\": \"Rol del firmante humano\",\n    \"puntos_de_control\": \"Aspectos críticos a auditar antes de cerrar el día\"\n  }\n}\n```\n",
+      "user_prompt_used": "# User Prompt: Inyección de Lote Diario de Tickets\n\n## Tarea\nProcesá el lote de tickets de soporte extraído de HubSpot CRM para la fecha solicitada. Aplicá las directivas de clasificación, diagnóstico de cuellos de botella y recomendaciones operativas estipuladas en el System Prompt. Devolvé únicamente el JSON estructurado solicitado.\n\n## Parámetros de la Corrida\n* **Fecha de consulta:** 2026-09-09\n* **Total de tickets en el lote:** 4\n* **Origen de datos:** HubSpot CRM API (`POST /crm/v3/objects/tickets/search`)\n\n## Lote de Tickets Recibidos (JSON crudo de HubSpot):\n```json\n[\n  {\n    \"id\": \"TK-20901\",\n    \"subject\": \"Demora en validación de matrícula provincial\",\n    \"content\": \"Cargué mis fotos de matrícula de PBA hace 72 horas y sigo en estado 'En revisión'. Tengo pacientes esperando prescripción hoy mismo.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-09T08:45:10Z\"\n  },\n  {\n    \"id\": \"TK-20904\",\n    \"subject\": \"No puedo subir foto del DNI\",\n    \"content\": \"La app me rechaza la foto del reverso del DNI diciendo 'formato no soportado', pero es un JPG estándar sacado con el celular.\",\n    \"priority\": \"MEDIUM\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-09T10:12:33Z\"\n  },\n  {\n    \"id\": \"TK-20908\",\n    \"subject\": \"Médico nuevo no puede configurar membrete\",\n    \"content\": \"Intento subir el logo del sanatorio para que salga en el encabezado de la receta y queda cortado.\",\n    \"priority\": \"LOW\",\n    \"stage\": \"in_progress\",\n    \"createdate\": \"2026-09-09T12:00:54Z\"\n  },\n  {\n    \"id\": \"TK-20912\",\n    \"subject\": \"Validación matrícula bloqueada\",\n    \"content\": \"Mi matrícula nacional vence en 2028 pero el validador automático me dice 'Matrícula no encontrada en SISA'.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-09T15:22:18Z\"\n  }\n]\n```\n"
+    }
+  },
+  "2026-09-10": {
+    "date": "2026-09-10",
+    "timestamp": "2026-09-10T18:30:00-03:00",
+    "source": "HubSpot Dataset Local (Prueba Verificada RCTA)",
+    "total_tickets": 3,
+    "tickets": [
+      {
+        "id": "TK-21001",
+        "subject": "Consulta sobre vademécum de psicofármacos",
+        "content": "Hola, ¿cómo hago para seleccionar duplicado para psicotrópicos Lista IV? No encuentro el casillero en la nueva versión.",
+        "priority": "MEDIUM",
+        "stage": "open",
+        "createdate": "2026-09-10T09:10:05Z"
+      },
+      {
+        "id": "TK-21005",
+        "subject": "Sugerencia: agregar posología predeterminada",
+        "content": "Estaría genial si se pudieran guardar indicaciones frecuentes (ej. 'cada 8hs durante 7 días') para no tipearlas en cada paciente.",
+        "priority": "LOW",
+        "stage": "closed",
+        "createdate": "2026-09-10T11:30:40Z"
+      },
+      {
+        "id": "TK-21010",
+        "subject": "Duda con receta archivada",
+        "content": "¿Dónde puedo ver el historial de recetas emitidas el mes pasado para un paciente específico?",
+        "priority": "LOW",
+        "stage": "closed",
+        "createdate": "2026-09-10T14:15:20Z"
+      }
+    ],
+    "audit_result": {
+      "success": true,
+      "data": {
+        "fecha_analisis": "2026-09-10",
+        "total_tickets": 3,
+        "estado_operativo": "Saludable",
+        "resumen_ejecutivo": "Operación estable sin incidencias bloqueantes ni errores de sistema. Los 3 tickets corresponden a consultas de usabilidad sobre psicofármacos, archivo histórico y sugerencias de producto.",
+        "distribucion_categorias": {
+          "Consulta_General": 2,
+          "Feedback_Producto": 1
+        },
+        "top_fricciones": [
+          {
+            "prioridad": 1,
+            "categoria": "Consulta General / Vademécum",
+            "tickets_afectados": [
+              "TK-21001"
+            ],
+            "diagnostico": "Dudas de navegación en la nueva interfaz para prescripción duplicada de psicofármacos.",
+            "accion_sugerida": "Responder con el artículo del centro de ayuda sobre emisión de psicotrópicos Lista IV."
+          },
+          {
+            "prioridad": 2,
+            "categoria": "Feedback Producto / Features",
+            "tickets_afectados": [
+              "TK-21005"
+            ],
+            "diagnostico": "Solicitud de plantillas de posología recurrente para reducir tiempo de prescripción.",
+            "accion_sugerida": "Registrar requerimiento en Jira Product Discovery para priorización en el próximo sprint."
+          },
+          {
+            "prioridad": 3,
+            "categoria": "Consulta General / Historial",
+            "tickets_afectados": [
+              "TK-21010"
+            ],
+            "diagnostico": "Orientación sobre filtros de fecha en el módulo de recetas archivadas.",
+            "accion_sugerida": "Indicar al usuario cómo acceder a la pestaña de auditoría histórica en su perfil."
+          }
+        ],
+        "alertas_inmediatas": [],
+        "supervision_humana": {
+          "nivel_l_requerido": "L1 (Supervisión pasiva con notificación)",
+          "responsable": "Customer Support Representative",
+          "puntos_de_control": "Verificar que las respuestas automáticas a consultas generales hayan dejado satisfecho al médico."
+        }
+      },
+      "raw_text": "{\n  \"fecha_analisis\": \"2026-09-10\",\n  \"total_tickets\": 3,\n  \"estado_operativo\": \"Saludable\",\n  \"resumen_ejecutivo\": \"Para el día 2026-09-10 se procesaron 3 tickets. Se observa concentración de casos de soporte en emisión y validación de usuarios con necesidad de atención operativa.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 0,\n    \"Friccion_Onboarding\": 0,\n    \"Consulta_General\": 2\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Operaciones / Triage\",\n      \"tickets_afectados\": [\n        \"TK-21001\",\n        \"TK-21005\"\n      ],\n      \"diagnostico\": \"Tickets con prioridad alta que requieren resolución antes de comprometer el servicio al paciente.\",\n      \"accion_sugerida\": \"Contactar a los médicos afectados y reasignar a guardia técnica inmediata.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket TK-21001 requiere seguimiento prioritario por severidad declarada.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Auditar si la causa raíz reportada en los tickets críticos afecta a más usuarios concurrentes.\"\n  }\n}",
+      "model": "gemini-2.5-flash (Simulado - Modo Local)",
+      "metrics": {
+        "input_tokens": 2011,
+        "output_tokens": 469,
+        "total_tokens": 2480,
+        "estimated_cost_usd": 0.000292,
+        "latency_ms": 1100
+      },
+      "system_prompt_used": "# System Prompt: Agente de Triage y Auditoría Diaria de Tickets (HubSpot CRM)\n\n## 1. Rol e Identidad\nSos un Agente Senior de Inteligencia Operativa, Triage y Auditoría de Customer Support para la plataforma de recetas médicas y servicios de salud RCTA. Tu función es auditar los tickets de soporte ingresados durante el día, diagnosticar la salud operativa de la plataforma y orientar al equipo de Customer Success y Producto hacia las soluciones más urgentes.\n\n## 2. Objetivo y Tarea\nAnalizar el lote diario de tickets extraídos de HubSpot CRM para una fecha específica. Debes:\n1. Clasificar cada ticket en una de las categorías operativas estándar: `Falla Técnica / Bug`, `Fricción Onboarding / Validación Matrícula`, `Emisión / Firma de Recetas`, `Farmacia / Dispensa`, `Facturación / Cuenta`, o `Consulta General`.\n2. Identificar el estado general del día (`Saludable`, `Alerta` o `Crítico`) según la severidad y concentración de incidencias.\n3. Sintetizar un resumen ejecutivo de 3 a 5 líneas con las observaciones clave.\n4. Calcular la distribución cuantitativa de tickets por categoría.\n5. Extraer el Top 3 de fricciones o cuellos de botella del día, indicando tickets afectados y una acción correctiva hiper-específica.\n6. Detectar cualquier alerta inmediata de riesgo (clientes frustrados de alto valor, caída de servicio o bloqueo masivo).\n7. Definir el nivel de supervisión humana requerido (L0 a L4) y el responsable asignado.\n\n## 3. Contexto\nRecibís un arreglo JSON con los tickets extraídos directamente de HubSpot CRM mediante la API de Tickets para una fecha dada. Cada ticket incluye: `id`, `subject`, `content` (descripción del problema reportado), `priority` (`HIGH`, `MEDIUM`, `LOW`) y `stage`.\n\n## 4. Restricciones\n* **Grounding Estricto y Verificable:** Basate exclusivamente en los datos presentes en el JSON de entrada. Prohibido inventar tickets, asumir causas no documentadas o citar IDs que no existan en el lote.\n* **Privacidad y Datos Sensibles:** No divulgues información confidencial de pacientes (nombres, patologías). Refiérete únicamente al ID de ticket y al síntoma funcional reportado por el médico o usuario.\n* **Concisión en Acciones:** Cada `accion_sugerida` debe ser hiper-específica, de máximo 20 palabras y redactada en modo imperativo.\n* **Salida Estructurada Pura:** Tu respuesta debe ser ÚNICAMENTE un bloque de código JSON válido, sin saludos, sin preámbulos tipo \"Aquí está el análisis\", y sin comentarios explicativos fuera del JSON.\n\n## 5. Ejemplo Few-Shot\n**Entrada de muestra:**\n```json\n[\n  {\n    \"id\": \"10492\",\n    \"subject\": \"Error al firmar con certificado digital\",\n    \"content\": \"Intento firmar la receta 4812 y la app se queda cargando indefinidamente en paso 3.\",\n    \"priority\": \"HIGH\",\n    \"stage\": \"open\"\n  },\n  {\n    \"id\": \"10495\",\n    \"subject\": \"Validación de matrícula pendiente\",\n    \"content\": \"Cargué mis papeles hace 4 días y todavía dice en revisión.\",\n    \"priority\": \"MEDIUM\",\n    \"stage\": \"in_progress\"\n  }\n]\n```\n\n**Salida esperada:**\n```json\n{\n  \"fecha_analisis\": \"2026-09-12\",\n  \"total_tickets\": 2,\n  \"estado_operativo\": \"Alerta\",\n  \"resumen_ejecutivo\": \"Se detectó incidencia bloqueante de firma digital y retrasos en validación documental. La falla de firma impacta directamente en la prescripción médica.\",\n  \"distribucion_categorias\": {\n    \"Emision_Firma_Recetas\": 1,\n    \"Friccion_Onboarding\": 1\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Emisión / Firma de Recetas\",\n      \"tickets_afectados\": [\"10492\"],\n      \"diagnostico\": \"Timeout recurrente en paso 3 de validación de firma digital.\",\n      \"accion_sugerida\": \"Escalar a ingeniería para revisar latencia del microservicio de firma digital.\"\n    },\n    {\n      \"prioridad\": 2,\n      \"categoria\": \"Fricción Onboarding\",\n      \"tickets_afectados\": [\"10495\"],\n      \"diagnostico\": \"Demoras en validación manual de matrículas médicas superando SLA de 48hs.\",\n      \"accion_sugerida\": \"Asignar validador de guardia para liquidar cola de aprobaciones demoradas.\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Ticket 10492 reporta bloqueo total de emisión por falla de firma.\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L2 (Revisión humana previa antes de accionar)\",\n    \"responsable\": \"Customer Support Lead\",\n    \"puntos_de_control\": \"Validar si el error de firma es aislado o sistémico antes de emitir comunicado.\"\n  }\n}\n```\n\n## 6. Formato de Salida Obligatorio\nTu única salida debe ser un objeto JSON parseable con esta estructura:\n```json\n{\n  \"fecha_analisis\": \"AAAA-MM-DD\",\n  \"total_tickets\": 0,\n  \"estado_operativo\": \"Saludable | Alerta | Crítico\",\n  \"resumen_ejecutivo\": \"Texto descriptivo de 3 a 5 líneas.\",\n  \"distribucion_categorias\": {\n    \"categoria_1\": 0,\n    \"categoria_2\": 0\n  },\n  \"top_fricciones\": [\n    {\n      \"prioridad\": 1,\n      \"categoria\": \"Nombre de categoría\",\n      \"tickets_afectados\": [\"ID1\", \"ID2\"],\n      \"diagnostico\": \"Diagnóstico claro del síntoma\",\n      \"accion_sugerida\": \"Acción específica de máximo 20 palabras\"\n    }\n  ],\n  \"alertas_inmediatas\": [\n    \"Detalle de alerta 1\",\n    \"Detalle de alerta 2\"\n  ],\n  \"supervision_humana\": {\n    \"nivel_l_requerido\": \"L0 | L1 | L2 | L3 | L4\",\n    \"responsable\": \"Rol del firmante humano\",\n    \"puntos_de_control\": \"Aspectos críticos a auditar antes de cerrar el día\"\n  }\n}\n```\n",
+      "user_prompt_used": "# User Prompt: Inyección de Lote Diario de Tickets\n\n## Tarea\nProcesá el lote de tickets de soporte extraído de HubSpot CRM para la fecha solicitada. Aplicá las directivas de clasificación, diagnóstico de cuellos de botella y recomendaciones operativas estipuladas en el System Prompt. Devolvé únicamente el JSON estructurado solicitado.\n\n## Parámetros de la Corrida\n* **Fecha de consulta:** 2026-09-10\n* **Total de tickets en el lote:** 3\n* **Origen de datos:** HubSpot CRM API (`POST /crm/v3/objects/tickets/search`)\n\n## Lote de Tickets Recibidos (JSON crudo de HubSpot):\n```json\n[\n  {\n    \"id\": \"TK-21001\",\n    \"subject\": \"Consulta sobre vademécum de psicofármacos\",\n    \"content\": \"Hola, ¿cómo hago para seleccionar duplicado para psicotrópicos Lista IV? No encuentro el casillero en la nueva versión.\",\n    \"priority\": \"MEDIUM\",\n    \"stage\": \"open\",\n    \"createdate\": \"2026-09-10T09:10:05Z\"\n  },\n  {\n    \"id\": \"TK-21005\",\n    \"subject\": \"Sugerencia: agregar posología predeterminada\",\n    \"content\": \"Estaría genial si se pudieran guardar indicaciones frecuentes (ej. 'cada 8hs durante 7 días') para no tipearlas en cada paciente.\",\n    \"priority\": \"LOW\",\n    \"stage\": \"closed\",\n    \"createdate\": \"2026-09-10T11:30:40Z\"\n  },\n  {\n    \"id\": \"TK-21010\",\n    \"subject\": \"Duda con receta archivada\",\n    \"content\": \"¿Dónde puedo ver el historial de recetas emitidas el mes pasado para un paciente específico?\",\n    \"priority\": \"LOW\",\n    \"stage\": \"closed\",\n    \"createdate\": \"2026-09-10T14:15:20Z\"\n  }\n]\n```\n"
+    }
+  }
+}

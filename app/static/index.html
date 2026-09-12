@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agente de Triage y Auditoría de Tickets · HubSpot + Gemini</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --card-border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #1f6feb;
+      --success: #2ea043;
+      --warning: #d29922;
+      --danger: #f85149;
+      --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      color: var(--text-bright);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .badge-materia {
+      background: #21262d;
+      border: 1px solid var(--card-border);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    /* Panel de Control */
+    .control-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    input[type="date"], select {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      color: var(--text-bright);
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="date"]:focus { border-color: var(--accent); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d1117;
+      font-weight: 600;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+    .btn-secondary {
+      background: #21262d;
+      color: var(--text-bright);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-secondary:hover { background: #30363d; }
+
+    .quick-dates {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .quick-dates span { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* Modal Alerta Re-ejecución */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--warning);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal-box h3 { color: var(--warning); font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 20px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* Métricas Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .metric-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .metric-card .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-top: 6px;
+    }
+    .metric-card .subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .status-Saludable { background: rgba(46, 160, 67, 0.2); color: #3fb950; border: 1px solid rgba(46, 160, 67, 0.4); }
+    .status-Alerta { background: rgba(210, 153, 34, 0.2); color: #d29922; border: 1px solid rgba(210, 153, 34, 0.4); }
+    .status-Crítico { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.4); }
+
+    /* Layout Resultados */
+    .results-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .results-section { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+    }
+
+    /* Fricciones */
+    .friccion-item {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .friccion-item.prio-1 { border-left-color: var(--danger); }
+    .friccion-item.prio-2 { border-left-color: var(--warning); }
+    .friccion-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .friccion-title { font-weight: 600; color: var(--text-bright); font-size: 14px; }
+    .friccion-tickets { font-size: 12px; font-family: var(--font-mono); color: var(--accent); }
+    .friccion-diag { font-size: 13px; color: var(--text); margin-bottom: 8px; }
+    .friccion-action {
+      font-size: 12.5px;
+      color: #7ee787;
+      background: rgba(46, 160, 67, 0.1);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--success);
+    }
+
+    /* Categorías */
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 13px;
+    }
+    .cat-name { color: var(--text); }
+    .cat-count { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
+
+    /* Alertas */
+    .alert-tag {
+      background: rgba(248, 81, 73, 0.15);
+      border-left: 3px solid var(--danger);
+      color: #ff7b72;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    /* Exportador */
+    .export-box {
+      background: #1c2128;
+      border: 1px solid #444c56;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .export-select { display: flex; align-items: center; gap: 8px; }
+
+    /* Historial */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .history-table th {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .history-table td {
+      padding: 8px;
+      border-bottom: 1px solid #21262d;
+    }
+    .history-table tr:hover { background: #21262d; cursor: pointer; }
+
+    .loading-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #0d1117;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Masthead -->
+  <header>
+    <div class="header-title">
+      <h1>Auditor Agéntico de Tickets Diarios</h1>
+      <p>Conector HubSpot CRM API + Análisis de Triage con Gemini</p>
+    </div>
+    <div class="badge-materia">MBA UCEMA · Trabajo Final</div>
+  </header>
+
+  <!-- Panel de Control -->
+  <div class="control-panel">
+    <div class="form-group">
+      <label for="date-input">Fecha a Auditar</label>
+      <input type="date" id="date-input" value="2026-09-08">
+    </div>
+
+    <button id="btn-run" class="btn-primary" onclick="handleRunClick()">
+      <span class="loading-spinner" id="btn-spinner"></span>
+      <span id="btn-text">Consultar y Auditar Tickets</span>
+    </button>
+
+    <div class="quick-dates">
+      <span>Fechas rápidas:</span>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-08')">08/09</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-09')">09/09</button>
+      <button class="btn-secondary" onclick="setQuickDate('2026-09-10')">10/09</button>
+    </div>
+  </div>
+
+  <!-- Modal Alerta Re-ejecución -->
+  <div id="modal-cache" class="modal-overlay">
+    <div class="modal-box">
+      <h3>⚠️ Fecha ya auditada previamente</h3>
+      <p id="modal-msg">Esta fecha ya cuenta con un informe agéntico guardado. ¿Deseas cargar el reporte almacenado o volver a consultar HubSpot y ejecutar Gemini?</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="confirmLoadCache()">Cargar Reporte Guardado</button>
+        <button class="btn-primary" onclick="confirmForceRun()">Forzar Re-ejecución</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métricas Principales -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="label">Estado del Día</div>
+      <div class="value" id="val-estado">—</div>
+      <div class="subtext" id="sub-estado">Sin análisis activo</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Tickets Procesados</div>
+      <div class="value" id="val-tickets">—</div>
+      <div class="subtext" id="sub-source">Origen: —</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Tokens & Inferencia</div>
+      <div class="value" id="val-tokens">—</div>
+      <div class="subtext" id="sub-tokens">Entrada / Salida</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Costo Económico</div>
+      <div class="value" id="val-costo">—</div>
+      <div class="subtext" id="sub-model">Modelo: Gemini Flash</div>
+    </div>
+  </div>
+
+  <!-- Contenedor Resultados -->
+  <div class="results-section">
+    <!-- Columna Izquierda: Diagnóstico y Fricciones -->
+    <div>
+      <div class="card">
+        <div class="card-title">Resumen Ejecutivo de Operaciones</div>
+        <p id="txt-resumen" style="color: var(--text-bright); line-height: 1.6;">Seleccioná una fecha y hacé clic en "Consultar y Auditar Tickets" para iniciar la extracción desde HubSpot y el análisis agéntico.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Top 3 Cuellos de Botella y Acciones Priorizadas</div>
+        <div id="fricciones-list">
+          <p style="color: var(--text-muted); font-size: 13px;">No hay fricciones cargadas.</p>
+        </div>
+      </div>
+
+      <!-- Exportador oficial -->
+      <div class="export-box">
+        <div class="export-select">
+          <label style="color: #adbac7; font-size: 12px;">Guardar en carpeta del Trabajo Final como:</label>
+          <select id="select-corrida">
+            <option value="1">corridas/corrida_1.md</option>
+            <option value="2">corridas/corrida_2.md</option>
+            <option value="3">corridas/corrida_3.md</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="exportCurrentCorrida()">💾 Exportar Corrida Oficial</button>
+      </div>
+      <div id="export-status" style="font-size: 12px; margin-top: 8px; color: var(--success);"></div>
+    </div>
+
+    <!-- Columna Derecha: Categorías, Supervisión y Alertas -->
+    <div>
+      <div class="card">
+        <div class="card-title">Distribución por Categoría</div>
+        <div id="categorias-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin datos.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Alertas Inmediatas</div>
+        <div id="alertas-list">
+          <p style="color: var(--text-muted); font-size: 13px;">Sin alertas.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Supervisión Humana (L0–L4)</div>
+        <div style="font-size: 13px;">
+          <p><strong>Nivel:</strong> <span id="txt-sup-nivel" style="color: var(--accent);">—</span></p>
+          <p style="margin-top: 6px;"><strong>Firmante:</strong> <span id="txt-sup-resp">—</span></p>
+          <p style="margin-top: 6px;"><strong>Control:</strong> <span id="txt-sup-ctrl" style="color: var(--text-muted);">—</span></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Historial de Consultas</div>
+        <table class="history-table" id="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tickets</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <tr><td colspan="3" style="color: var(--text-muted);">Cargando historial...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
