@@ -46,7 +46,7 @@ def run_ticket_audit(date_str: str, tickets: list, model: str = None) -> dict:
     Devuelve la respuesta estructurada, los tokens medidos y los costos.
     """
     api_key = os.getenv("GEMINI_API_KEY", "")
-    model = model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    model = model or os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
     system_prompt_text, user_prompt_template = load_prompt_templates()
 
     # Inyección en el User Prompt

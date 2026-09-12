@@ -236,7 +236,7 @@ def manage_config():
         g_key = os.getenv("GEMINI_API_KEY", "")
         h_token = os.getenv("HUBSPOT_ACCESS_TOKEN", "")
         n8n_url = os.getenv("N8N_WEBHOOK_URL", "")
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
         return jsonify({
             "gemini_api_key_configured": bool(g_key and g_key != "tu_api_key_gemini_aqui"),
             "hubspot_token_configured": bool(h_token and h_token != "tu_token_privado_hubspot_aqui"),
@@ -249,7 +249,7 @@ def manage_config():
     g_key = data.get("gemini_api_key", "").strip()
     h_token = data.get("hubspot_token", "").strip()
     n8n_url = data.get("n8n_url", "").strip()
-    model = data.get("gemini_model", "gemini-2.5-flash").strip()
+    model = data.get("gemini_model", "gemini-3.6-flash").strip()
 
     # Actualizar os.environ en memoria
     if g_key:
@@ -266,7 +266,7 @@ def manage_config():
 GEMINI_API_KEY={os.environ.get('GEMINI_API_KEY', '')}
 HUBSPOT_ACCESS_TOKEN={os.environ.get('HUBSPOT_ACCESS_TOKEN', '')}
 N8N_WEBHOOK_URL={os.environ.get('N8N_WEBHOOK_URL', '')}
-GEMINI_MODEL={os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')}
+GEMINI_MODEL={os.environ.get('GEMINI_MODEL', 'gemini-3.6-flash')}
 PORT={os.environ.get('PORT', 8000)}
 """
     with open(env_path, "w", encoding="utf-8") as f:
@@ -280,7 +280,7 @@ def test_gemini():
     import requests, time
     data = request.get_json() or {}
     key = data.get("api_key", "").strip() or os.getenv("GEMINI_API_KEY", "")
-    model = data.get("model", "gemini-2.5-flash").strip()
+    model = data.get("model", "gemini-3.6-flash").strip()
 
     if not key or key == "tu_api_key_gemini_aqui":
         return jsonify({"success": False, "error": "No se ingresó ninguna clave de Gemini"}), 400
